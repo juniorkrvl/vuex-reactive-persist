@@ -14,8 +14,8 @@ export default class Storage {
     this.watchers = {};
 
     this.storage = this.storage || {
-      get: key => window.localStorage[key],
-      set: (key, val) => window.localStorage[(key, val)]
+      getItem: key => window.localStorage[key],
+      setItem: (key, val) => window.localStorage[(key, val)]
     };
 
     // watch every 1000s
@@ -25,7 +25,7 @@ export default class Storage {
   // Call every watcher that has changed values
   _callWatchers() {
     Object.keys(this.watchers).forEach(key => {
-      if (this.previusValue[key] !== this.storage[key]) {
+      if (this.previusValue[key] !== this.storage.getItem(key)) {
         this.watchers[key].forEach(f => f());
       }
     });
@@ -36,8 +36,9 @@ export default class Storage {
    * @param {*String} key Key name
    * @param {*Any} def Default value
    */
-  get(key, def) {
-    this.previusValue[key] = this.parser(this.storage[key]) || def;
+  get(key) {
+    const val = this.parser(this.storage.getItem(key));
+    this.previusValue[key] = val || this.previusValue[key];
     return this.previusValue[key];
   }
 
@@ -48,7 +49,7 @@ export default class Storage {
    */
   set(key, val) {
     this.previusValue[key] = this.reducer(val);
-    this.storage[key] = this.previusValue[key];
+    this.storage.setItem(key, this.previusValue[key]);
   }
 
   /**
