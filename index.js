@@ -13,8 +13,8 @@ export default function(options) {
   // replace the current state with new state from storage
   const replaceState = store => {
     const savedState = storage.get(key);
-    if (!savedState) return;
-    store.replaceState(Object.assign({}, store.state, savedState));
+    if (!savedState || !Object.keys(savedState).length) return;
+    store.replaceState(Object.assign(store.state, savedState));
   };
 
   // find changes between previous and current state and callback watches
@@ -51,20 +51,15 @@ export default function(options) {
       const hasChange = invokeWatchers(store, state);
       // save only on change
       if (!hasChange) return;
-      let picked = pick(state, options.paths);
+      let picked = {};
+      (options.paths || Object.keys(state)).forEach(key => {
+        let sub = picked;
+        key.split('.').forEach(x => {
+          sub[x] = state[x];
+          sub = sub[x];
+        });
+      });
       storage.set(key, picked);
     });
   };
-}
-
-/**
- * Pick all values specified by te paths and returns an array
- * @param {*Object} object Object to use
- * @param {*Array} paths List of paths to pick
- */
-export function pick(object, paths) {
-  if (!paths || !object) return object;
-  let picked = {};
-  paths.forEach(key => (picked[key] = object[key]));
-  return picked;
 }

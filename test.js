@@ -119,22 +119,22 @@ it('persist the changed full state back to serialized JSON when no paths are giv
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
 });
 
-// it('persist the changed partial state back to serialized JSON under a nested path', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
+it('persist the changed partial state back to serialized JSON under a nested path', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
 
-//   const plugin = reactivePersistedState({
-//     storage,
-//     paths: ['foo.bar', 'bar']
-//   });
-//   plugin(store);
+  const plugin = reactivePersistedState({
+    storage,
+    paths: ['foo.bar', 'bar']
+  });
+  plugin(store);
 
-//   store._subscribers[0]('mutation', { foo: { bar: 'baz' }, bar: 'baz' });
+  store._subscribers[0]('mutation', { foo: { bar: 'baz' }, bar: 'baz' });
 
-//   expect(storage.getItem('vuex')).toBe(
-//     JSON.stringify({ foo: { bar: 'baz' }, bar: 'baz' })
-//   );
-// });
+  expect(storage.getItem('vuex')).toBe(
+    JSON.stringify({ foo: { bar: 'baz' }, bar: 'baz' })
+  );
+});
 
 // it('should not persist null values', () => {
 //   const storage = new Storage();
