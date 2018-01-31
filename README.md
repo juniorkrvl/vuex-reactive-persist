@@ -14,19 +14,19 @@ This module is helpful in case you want pass your changed state across multiple 
 ## Installation
 
 ```bash
-$ npm install vuex-reactive-persist
+npm install vuex-reactive-persist
 ```
 
 ## Usage
-
-<!-- [![Edit vuex-persistedstate](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/80k4m2598?autoresize=1) -->
 
 ```js
 import reactivePersist from 'vuex-reactive-persist'
 
 const store = new Vuex.Store({
   // ...
-  plugins: [reactivePersist()]
+  plugins: [
+    reactivePersist()
+  ]
 })
 ```
 
