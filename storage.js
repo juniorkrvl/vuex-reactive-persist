@@ -37,9 +37,12 @@ export default class Storage {
    * @param {*Any} def Default value
    */
   get(key) {
-    const val = this.parser(this.storage.getItem(key));
-    this.previusValue[key] = val || this.previusValue[key];
-    return this.previusValue[key];
+    try {
+      const val = this.parser(this.storage.getItem(key));
+      this.previusValue[key] = val || this.previusValue[key];
+    } finally {
+      return this.previusValue[key];
+    }
   }
 
   /**
@@ -48,8 +51,11 @@ export default class Storage {
    * @param {*Any} val Value to store
    */
   set(key, val) {
-    this.previusValue[key] = this.reducer(val);
-    this.storage.setItem(key, this.previusValue[key]);
+    try {
+      this.previusValue[key] = this.reducer(val);
+      this.storage.setItem(key, this.previusValue[key]);
+    } finally {
+    }
   }
 
   /**

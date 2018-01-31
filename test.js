@@ -31,20 +31,20 @@ it("replaces store's state and subscribes to changes when initializing", () => {
   expect(store.subscribe).toBeCalled();
 });
 
-// it("does not replaces store's state when receiving invalid JSON", () => {
-//   const storage = new Storage();
-//   storage.setItem('vuex', '<invalid JSON>');
+it("does not replaces store's state when receiving invalid JSON", () => {
+  const storage = new Storage();
+  storage.setItem('vuex', '<invalid JSON>');
 
-//   const store = new Vuex.Store({ state: { nested: { original: 'state' } } });
-//   store.replaceState = jest.fn();
-//   store.subscribe = jest.fn();
+  const store = new Vuex.Store({ state: { nested: { original: 'state' } } });
+  store.replaceState = jest.fn();
+  store.subscribe = jest.fn();
 
-//   const plugin = reactivePersistedState({ storage });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage });
+  plugin(store);
 
-//   expect(store.replaceState).not.toBeCalled();
-//   expect(store.subscribe).toBeCalled();
-// });
+  expect(store.replaceState).not.toBeCalled();
+  expect(store.subscribe).toBeCalled();
+});
 
 // it("does not replaces store's state when receiving null", () => {
 //   const storage = new Storage();
