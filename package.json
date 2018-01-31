@@ -1,6 +1,6 @@
 {
   "name": "vuex-reactive-persist",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "description": "Persist the vuex states to localstorage and watch for changes",
   "author": "Sudipto Chandra <dipu.sudipta@gmail.com>",
   "license": "MIT",
