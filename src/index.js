@@ -3,7 +3,7 @@ import Storage from './storage';
 
 export default function(options) {
   options = options || {};
-  let {mutations, filter, paths, watch} = options;
+  let { mutations, filter, paths, watch } = options;
   const storage = new Storage(options);
 
   // make options paths available
@@ -25,10 +25,10 @@ export default function(options) {
     const savedState = storage.getState();
     if (!savedState) return;
     store.replaceState(Object.assign(store.state, savedState));
-  }
+  };
 
   // find changes between previous and current state and callback watches
-  const invokeWatchers = (store, state) => {
+  const invokeWatchers = (store, state, reverse = false) => {
     let hasChange = false;
     state = state || store.state;
     const prevState = storage.getState() || {};
@@ -37,12 +37,14 @@ export default function(options) {
       const savedVal = dotty.get(prevState, path);
       if (stateVal === savedVal) return;
       hasChange = true;
-      if (options.watch && options.watch[path]) {
-        options.watch[path](stateVal, savedVal, store);
+      if (watch && watch[path]) {
+        reverse
+          ? watch[path](savedVal, stateVal, store)
+          : watch[path](stateVal, savedVal, store);
       }
-    })
+    });
     return hasChange;
-  }
+  };
 
   return function(store) {
     // restore state
@@ -52,9 +54,9 @@ export default function(options) {
 
     // watch storage value change
     storage.on(() => {
-      invokeWatchers(store);
+      invokeWatchers(store, (reverse = true));
       replaceState(store);
-    })
+    });
 
     store.subscribe((mutation, state) => {
       // check if mutation type should be considered
@@ -69,9 +71,9 @@ export default function(options) {
         options.paths.forEach(key => {
           const val = dotty.get(state, key);
           dotty.put(picked, key, val);
-        })
+        });
       }
       storage.setState(picked);
-    })
-  }
+    });
+  };
 }
