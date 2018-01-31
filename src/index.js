@@ -8,15 +8,10 @@ export default function(opt) {
   opt.watchInterval = opt.watchInterval || 1000;
 
   // filters the mutation type
-  opt.filter =
-    opt.filter ||
-    function(type) {
-      if (!opt.watch) return false;
-      if (Array.isArray(opt.watch)) {
-        return opt.watch.indexOf(type) < 0;
-      }
-      return !(type in opt.watch);
-    };
+  if (!(opt.filter instanceof Function)) {
+    let arr = opt.filter;
+    opt.filter = x => !arr || arr(x) >= 0;
+  }
 
   // replace the current state with new state from storage
   opt.replaceState = () => {
@@ -53,12 +48,11 @@ export default function(opt) {
     }
 
     store.subscribe((mutation, state) => {
+      // check if mutation type should be considered
       const type = mutation.type || mutation;
-      if (opt.filter(type)) return;
-      if (opt.watch && !Array.isArray(opt.watch)) {
-        opt.watch[type] && opt.watch[type](store, state);
-      }
+      if (!opt.filter(type)) return;
       opt.storeState(state);
+      opt.watch && opt.watch(mutation, state, store);
     });
   };
 }
