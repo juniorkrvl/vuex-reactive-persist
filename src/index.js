@@ -24,7 +24,7 @@ export default function(options) {
   const replaceState = store => {
     const savedState = storage.getState();
     if (!savedState) return;
-    store.replaceState(Object.assign(store.state, savedState));
+    store.replaceState(Object.assign({}, store.state, savedState));
   };
 
   // find changes between previous and current state and callback watches
