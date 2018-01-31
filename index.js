@@ -1,10 +1,9 @@
-import LocalStorage from './src/storage';
-import { pick, deepCopy } from './src/utils';
+import Storage from './storage';
 
 export default function(options) {
   options = options || {};
   const key = options.key || 'vuex';
-  const storage = new LocalStorage(options);
+  const storage = new Storage(options);
 
   // filters the mutation type
   const filter =
@@ -15,9 +14,7 @@ export default function(options) {
 
   // replace the current state with new state from storage
   const replaceState = store => {
-    const old = deepCopy(store.state);
-    const current = storage.get(key);
-    store.replaceState(Object.assign(old, current));
+    store.replaceState(Object.assign({}, old, storage.get(key)));
   };
 
   // find changes between previous and current state and callback watches
@@ -54,4 +51,19 @@ export default function(options) {
       }
     });
   };
+}
+
+/**
+ * Pick all values specified by te paths and returns an array
+ * @param {*Object} object Object to use
+ * @param {*Array} paths List of paths to pick
+ */
+export function pick(object, paths) {
+  let list = [];
+  paths.forEach(key => {
+    if (object.hasOwnProperty(key)) {
+      list.push(object[key]);
+    }
+  });
+  return list;
 }
