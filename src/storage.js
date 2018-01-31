@@ -10,7 +10,7 @@ export default class Storage {
     this.parser = parser || JSON.parse;
     this.storage = storage || {
       getItem: k => window.localStorage[k],
-      setItem: (k, v) => window.localStorage[k] = v
+      setItem: (k, v) => (window.localStorage[k] = v)
     };
 
     // watch every 1000s for changed values
@@ -28,7 +28,6 @@ export default class Storage {
       this.previousValue = this.storage.getItem(this.key);
       return this.parser(this.previousValue);
     } catch (err) {
-      this.storage.setItem(this.key, '');
       return null;
     }
   }
@@ -43,16 +42,16 @@ export default class Storage {
 
   on(callback) {
     if (callback && callback instanceof Function) {
-      this.watchers.push(callback)
-      return true
+      this.watchers.push(callback);
+      return true;
     }
-    return false
+    return false;
   }
 
   off(callback) {
-    const index = this.watchers.indexOf(callback)
-    if (index < 0) return false
-    this.watchers.splice(index, 1)
-    return true
+    const index = this.watchers.indexOf(callback);
+    if (index < 0) return false;
+    this.watchers.splice(index, 1);
+    return true;
   }
 }
