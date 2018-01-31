@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Storage from 'dom-storage';
-import dot from '../src/doto';
 import reactivePersistedState from '../src/index';
 
 // Do not show the production tip while running tests.
@@ -14,39 +13,6 @@ function later(delay) {
     setTimeout(resolve, delay);
   });
 }
-
-test('whether the deep key function works', () => {
-  window.localStorage = new Storage();
-  expect(
-    dot.keys({
-      foo: 1,
-      bar: {
-        a: 'small',
-        b: 'big',
-        an: ['a', { r: 'r' }, { a: { y: true } }],
-        c: {
-          a: 'b',
-          middle: 2,
-          test: {
-            a: {
-              y: true
-            }
-          }
-        }
-      }
-    })
-  ).toEqual([
-    'foo',
-    'bar.a',
-    'bar.b',
-    'bar.an.0',
-    'bar.an.1.r',
-    'bar.an.2.a.y',
-    'bar.c.a',
-    'bar.c.middle',
-    'bar.c.test.a.y'
-  ]);
-});
 
 it('can be created with the default options', () => {
   window.localStorage = new Storage();
@@ -84,7 +50,6 @@ it('has properly configured plugin option', () => {
   expect(options.filter).toBeInstanceOf(Function);
   expect(options.storeState).toBeInstanceOf(Function);
   expect(options.replaceState).toBeInstanceOf(Function);
-  expect(options.invokeWatchers).toBeInstanceOf(Function);
 });
 
 it("does not replaces store's state when receiving invalid JSON", () => {
@@ -292,94 +257,51 @@ it('works using filter method', () => {
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
 });
 
-it('calls watch methods on mutation', () => {
+it('calls watch method on mutation', () => {
   const storage = new Storage();
-  const store = new Vuex.Store({ state: { changed: 'saved' } });
+  const store = new Vuex.Store({ state: { changed: { foo: 'saved' } } });
 
   const watchedKey = jest.fn();
   const options = {
     storage,
-    watch: { changed: watchedKey }
+    watch: { mutation: watchedKey }
   };
   reactivePersistedState(options)(store);
 
-  store._subscribers[0]('mutation', { changed: 'state' });
-  expect(watchedKey).toBeCalled();
+  store._subscribers[0]('mutation', { changed: { foo: 'bar' } });
+  expect(watchedKey).toBeCalledWith(store);
 });
 
-it('calls watch methods on manual invoke with reverse option', () => {
-  const storage = new Storage();
-  const store = new Vuex.Store({ state: { changed: 'saved' } });
-
-  const watchedKey = jest.fn();
-  const options = {
-    storage,
-    watch: { changed: watchedKey }
-  };
-  reactivePersistedState(options)(store);
-
-  storage.setItem('vuex', JSON.stringify({ changed: 'new' }));
-
-  options.invokeWatchers({ reverse: true });
-  expect(watchedKey).toBeCalledWith('new', 'saved', store);
-});
-
-it('watched keys are being from watcher', done => {
-  const storage = new Storage();
-  const store = new Vuex.Store({ state: { changed: 'saved' } });
-
-  const watchedKey = jest.fn();
-  const options = {
-    storage,
-    watchInterval: 10,
-    watch: { changed: watchedKey }
-  };
-  reactivePersistedState(options)(store);
-
-  storage.setItem('vuex', JSON.stringify({ changed: 'new' }));
-
-  return later(15).then(() => {
-    expect(watchedKey).toBeCalledWith('new', 'saved', store);
-    done();
-  });
-});
-
-it('calls nested watch methods on change in storage', done => {
+it('replaces nested object value on change in storage', done => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: { foo: { bar: 5 } } });
 
-  const watchedKey = jest.fn();
-  const options = {
+  reactivePersistedState({
     storage,
-    watchInterval: 10,
-    watch: { 'foo.bar': watchedKey }
-  };
-  reactivePersistedState(options)(store);
+    watchInterval: 10
+  })(store);
 
   storage.setItem('vuex', JSON.stringify({ foo: { bar: 2 } }));
 
   return later(25).then(() => {
-    expect(watchedKey).toBeCalledWith(2, 5, store);
+    expect(store.state.foo.bar).toBe(2);
     done();
   });
 });
 
-it('calls watch methods on deleting nested value in the storage', done => {
+it('deletes nested object on change in the storage', done => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: { foo: { bar: 5 } } });
 
-  const watchedKey = jest.fn();
-  const options = {
+  reactivePersistedState({
     storage,
-    watchInterval: 10,
-    watch: { 'foo.bar': watchedKey }
-  };
-  reactivePersistedState(options)(store);
+    watchInterval: 10
+  })(store);
 
   storage.setItem('vuex', JSON.stringify({ foo: {} }));
 
   return later(25).then(() => {
-    expect(watchedKey).toBeCalledWith(undefined, 5, store);
+    expect(store.state.foo.bar).toBe(undefined);
     done();
   });
 });

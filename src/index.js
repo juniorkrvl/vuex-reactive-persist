@@ -1,4 +1,5 @@
-import dot from './doto';
+import getValue from 'get-value';
+import setValue from 'set-value';
 import Storage from './storage';
 
 export default function(opt) {
@@ -21,33 +22,15 @@ export default function(opt) {
   // stores the current state
   opt.storeState = state => {
     state = state || opt.store.state;
-    let picked = opt.paths ? {} : state;
-    opt.paths &&
-      opt.paths.forEach(path => {
-        dot.set(picked, path, dot.get(state, path));
-      });
+    let picked = state;
+    if (opt.paths) {
+      picked = {};
+      opt.paths &&
+        opt.paths.forEach(path => {
+          setValue(picked, path, getValue(state, path));
+        });
+    }
     opt.storage.setState(picked);
-  };
-
-  // find changes between previous and current state and callback watches
-  opt.invokeWatchers = ({ state, reverse }) => {
-    let hasChange = false;
-    state = state || opt.store.state;
-    const prevState = opt.storage.getState() || {};
-    (opt.paths || dot.keys(state)).forEach(path => {
-      const stateVal = dot.get(state, path);
-      const savedVal = dot.get(prevState, path);
-      if (stateVal === savedVal) return;
-      hasChange = true;
-      if (dot.has(opt.watch, path)) {
-        dot.get(opt.watch, path)(
-          reverse ? savedVal : stateVal,
-          reverse ? stateVal : savedVal,
-          opt.store
-        );
-      }
-    });
-    return hasChange;
   };
 
   return function(store) {
@@ -63,12 +46,9 @@ export default function(opt) {
     }
 
     store.subscribe((mutation, state) => {
-      // check if mutation type should be considered
-      if (!opt.filter(mutation.type || mutation)) return;
-      // find current changes
-      const hasChange = opt.invokeWatchers({ state });
-      // save only on change
-      if (!hasChange) return;
+      const type = mutation.type || mutation;
+      opt.watch && opt.watch[type] && opt.watch[type](store);
+      if (!opt.filter(type)) return;
       opt.storeState(state);
     });
   };
