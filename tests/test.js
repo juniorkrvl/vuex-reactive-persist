@@ -269,7 +269,7 @@ it('can properly use watch object on mutation', () => {
   expect(storage.getItem('vuex')).toBe(
     JSON.stringify({ changed: { foo: 'bar' } })
   );
-  expect(watchedKey).toBeCalledWith(store);
+  expect(watchedKey).toBeCalledWith(store, { changed: { foo: 'bar' } });
 });
 
 it('replaces nested object value on change in storage', done => {

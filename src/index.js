@@ -10,9 +10,8 @@ export default function(opt) {
   // filters the mutation type
   opt.filter =
     opt.filter ||
-    function(mutation) {
+    function(type) {
       if (!opt.watch) return false;
-      const type = mutation.type || mutation;
       if (Array.isArray(opt.watch)) {
         return opt.watch.indexOf(type) < 0;
       }
@@ -54,9 +53,12 @@ export default function(opt) {
     }
 
     store.subscribe((mutation, state) => {
-      if (opt.filter(mutation)) return;
+      const type = mutation.type || mutation;
+      if (opt.filter(type)) return;
+      if (opt.watch && !Array.isArray(opt.watch)) {
+        opt.watch[type] && opt.watch[type](store, state);
+      }
       opt.storeState(state);
-      opt.watch[type] && opt.watch[type](store, state);
     });
   };
 }
