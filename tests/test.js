@@ -31,6 +31,22 @@ it("replaces store's state and subscribes to changes when initializing", () => {
   expect(store.subscribe).toBeCalled();
 });
 
+it('plugin options are properly configured', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
+
+  const options = { storage };
+  reactivePersistedState(options)(store);
+
+  expect(options.store).toBe(store);
+  expect(options.storage).not.toBeNull();
+  expect(options.storage.key).toBe('vuex');
+  expect(options.filter).toBeInstanceOf(Function);
+  expect(options.replaceState).toBeInstanceOf(Function);
+  expect(options.invokeWatchers).toBeInstanceOf(Function);
+  expect(options.initializeStorage).toBeInstanceOf(Function);
+});
+
 it("does not replaces store's state when receiving invalid JSON", () => {
   const storage = new Storage();
   storage.setItem('vuex', '<invalid JSON>');
@@ -152,7 +168,7 @@ it('should not persist null values', () => {
   store._subscribers[0]('mutation', { charlie: { name: 'charlie' } });
 
   expect(storage.getItem('vuex')).toBe(
-    JSON.stringify({ alpha: { bravo: { } } })
+    JSON.stringify({ alpha: { bravo: {} } })
   );
 });
 
@@ -168,7 +184,7 @@ it('should not merge array values when rehydrating', () => {
   plugin(store);
 
   expect(store.replaceState).toBeCalledWith({
-    persisted: ['json'],
+    persisted: ['json']
   });
 
   expect(store.subscribe).toBeCalled();
@@ -190,7 +206,7 @@ it('should not clone circular objects when rehydrating', () => {
 
   expect(store.replaceState).toBeCalledWith({
     circular,
-    persisted: 'baz',
+    persisted: 'baz'
   });
 
   expect(store.subscribe).toBeCalled();
@@ -208,7 +224,7 @@ it('filters to specific mutations with mutations', () => {
 
   store._subscribers[0]('mutation', { changed: 'state' });
 
-  expect(storage.getItem('vuex')).toBe('{}')
+  expect(storage.getItem('vuex')).toBe('{}');
 
   store._subscribers[0]('filter', { changed: 'state' });
 
@@ -227,7 +243,7 @@ it('filters to specific mutations using filter method', () => {
 
   store._subscribers[0]('mutation', { changed: 'state' });
 
-  expect(storage.getItem('vuex')).toBe('{}')
+  expect(storage.getItem('vuex')).toBe('{}');
 
   store._subscribers[0]('filter', { changed: 'state' });
 
