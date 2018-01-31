@@ -22,7 +22,7 @@ export default function(options) {
     let hasChange = false;
     state = state || store.state;
     const prev = storage.get(key) || {};
-    const paths = options.paths || Object.keys(store.state);
+    const paths = options.paths || Object.keys(state);
     paths.forEach(path => {
       if (prev[path] === state[path]) return;
       hasChange = true;
