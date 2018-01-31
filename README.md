@@ -42,7 +42,7 @@ const store = new Vuex.Store({
     reactivePersist({
       key: 'vuex', // The key to store the persisted state,
       watchInterval: 1000, // The interval to observe storage change.
-                           // Set it to `0` to disable storage watching.
+                           // Set it to `-1` to disable storage watching.
                            // This is not related with the `watch` option.
       initialize: function(store) {
         // This is called right after the `store` is replaced with saved value

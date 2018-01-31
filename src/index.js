@@ -4,6 +4,7 @@ import Storage from './storage';
 export default function(options) {
   const plugin = options || {};
   plugin.storage = new Storage(plugin);
+  plugin.watchInterval = plugin.watchInterval || 1000;
 
   // make options paths available
   plugin.initializeStorage = () => {
@@ -58,7 +59,7 @@ export default function(options) {
     plugin.initialized && plugin.initialized(store);
 
     // watch storage value change
-    if (!plugin.watchInterval) {
+    if (plugin.watchInterval >= 0) {
       plugin.storage.on(() => {
         plugin.invokeWatchers({ reverse: true });
         plugin.replaceState();

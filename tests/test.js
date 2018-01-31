@@ -288,20 +288,42 @@ it('watched keys are being called on manual invoke with reverse option', () => {
   expect(watchedKey).toBeCalledWith('new', 'saved', store);
 });
 
-it('watched keys are being from watcher', () => {
+it('watched keys are being from watcher', done => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: { changed: 'saved' } });
 
   const watchedKey = jest.fn();
   const options = {
     storage,
+    watchInterval: 10,
     watch: { changed: watchedKey }
   };
   reactivePersistedState(options)(store);
 
   storage.setItem('vuex', JSON.stringify({ changed: 'new' }));
 
-  return later(2000).then(() => {
+  return later(15).then(() => {
     expect(watchedKey).toBeCalledWith('new', 'saved', store);
+    done();
+  });
+});
+
+it('check watched keys for multiple object', done => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: { changed: 'saved' } });
+
+  const watchedKey = jest.fn();
+  const options = {
+    storage,
+    watchInterval: 10,
+    watch: { changed: watchedKey }
+  };
+  reactivePersistedState(options)(store);
+
+  storage.setItem('vuex', JSON.stringify({ changed: { foo: 'bar' } }));
+
+  return later(15).then(() => {
+    expect(watchedKey).toBeCalledWith({ foo: 'bar' }, 'saved', store);
+    done();
   });
 });

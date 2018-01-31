@@ -38,6 +38,6 @@ export default class Storage {
         this.previousValue = saved;
         callback();
       }
-    }, interval);
+    }, interval || 1000);
   }
 }
