@@ -41,7 +41,48 @@ can be provided to configure the plugin for your specific needs:
 - `filter <Function>`: A function that will be called to filter any mutations which will trigger. You can also pass `mutations` instead.
 - `mutations <Array>`: List of mutations to monitor. If `filter` method is provided this will be ignored.
 - `watch <Object>`: Prove keys to observe for changes. Keys should be functions that accepts three params: `stateVal`, `savedVal`, `store`.
-- `initialized <Function>`: Called with `store` param after the plugin has been initialized.
+- `initialized <Function>`: This is called right after the `store` is replaced with saved value. It provided the `store` as argument.
+
+### More on `watch` feature
+
+The module automatically watches for changes. You can listen to them by passing keys to `watch` option. Suppose you have vuex store with state like this:
+
+```js
+{
+  some: 'thing',
+  parent: {
+    child: 'state',
+    another: 'child'
+  }
+}
+```
+
+You can watch for changes like this:
+
+```js
+reactivePersist({
+  watch: {
+    some: function(current, saved, store) {
+      console.log('some property has been changed!');
+    },
+    'parent.child': function(current, saved, store) {
+      console.log(current, saved)
+      store.dispatch('action')
+    }
+  }
+})
+```
+
+### `initialize` method
+
+
+```js
+reactivePersist({
+  initialize: function(store) {
+    store.dispatch('clock/start')
+  }
+})
+```
 
 ## Customize Storage
 
