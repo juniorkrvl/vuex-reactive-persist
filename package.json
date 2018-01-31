@@ -2,16 +2,45 @@
   "name": "vuex-reactive-persist",
   "version": "0.0.1",
   "description": "Persist the vuex states to localstorage and watch for changes",
-  "main": "index.js",
+  "author": "Sudipto Chandra <dipu.sudipta@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
-    "build": "rimraf dist && microbundle --external all --name reactivePersistedState index.js",
-    
-    "test": "npm-run-all test:**"
+    "build": "microbundle --output dist --name reactivePersistedState index.js",
+    "precommit": "npm run build && lint-staged",
+    "prepublish": "npm run build",
+    "test": "npm-run-all test:**",
+    "test:jest": "jest --env=jsdom",
+    "test:size": "bundlesize"
+  },
+  "main": "index.js",
+  "module": "dist/vuex-reactive-persist.es.js",
+  "jsnext:main": "dist/vuex-reactive-persist.es.js",
+  "umd:main": "dist/vuex-reactive-persist.umd.js",
+  "lint-staged": {
+    "index.js": [
+      "prettier --single-quote --write",
+      "git add"
+    ]
+  },
+  "bundlesize": [
+    {
+      "path": "./dist/*.js",
+      "threshold": "800b"
+    }
+  ],
+  "babel": {
+    "presets": [
+      "env"
+    ]
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/dipu-bd/vuex-reactive-persist.git"
   },
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "vue",
     "vuex",
@@ -20,12 +49,9 @@
     "persistent",
     "storage"
   ],
-  "author": "Sudipto Chandra <dipu.sudipta@gmail.com>",
-  "license": "MIT",
   "bugs": {
     "url": "https://github.com/dipu-bd/vuex-reactive-persist/issues"
   },
-  "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "devDependencies": {
     "babel-jest": "^22.1.0",
     "babel-preset-env": "^1.6.1",
