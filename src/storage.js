@@ -1,28 +1,35 @@
-const storage = window.localStorage
-
-// Call every watcher that has changed values
-function callWatchers(watchers, previusValue) {
-  Object.keys(watchers).forEach(key => {
-    if (previusValue[key] !== window.localStorage[key]) {
-      watchers[key].forEach(f => f())
-    }
-  })
-}
-
-export default class LocalStorage {
+export default class Storage {
   /**
-   * Creates a new instance
-   * @param {*Function} reducer Reduces the value to string
-   * @param {*Function} parser Parses the value from string
+   * Creates a new instance of Storage
+   * @param {*Object} options {
+   *    storage: Use custom storage. Must have get/set methods accepting key as parameter.
+   *    reducer: Reduces the value to string,
+   *    parser: Parses the value from string
+   * }
    */
-  constructor(reducer, parser) {
+  constructor({storage, reducer, parser}) {
     this.reducer = reducer || (v => JSON.stringify(v))
     this.parser = parser || (v => JSON.parse(v))
-    this.watchers = {}
     this.previusValue = {}
+    this.watchers = {}
+
+    this.storage = this.storage || {
+      get: (key) => window.localStorage[key],
+      set: (key, val) => window.localStorage[key, val]
+    }
     
     // watch every 1000s
-    setInterval(() => callWatchers(this.watchers, this.previusValue), 1000)
+    setInterval(this._callWatchers, 1000)
+  }
+  
+
+  // Call every watcher that has changed values
+  _callWatchers() {
+    Object.keys(this.watchers).forEach(key => {
+      if (this.previusValue[key] !== this.storage[key]) {
+        this.watchers[key].forEach(f => f())
+      }
+    })
   }
 
   /**
@@ -31,7 +38,7 @@ export default class LocalStorage {
    * @param {*Any} def Default value
    */
   get(key, def) {
-    this.previusValue[key] = this.parser(storage[key]) || def
+    this.previusValue[key] = this.parser(this.storage[key]) || def
     return this.previusValue[key]
   }
 
@@ -42,7 +49,7 @@ export default class LocalStorage {
    */
   set(key, val) {
     this.previusValue[key] = this.reducer(val)
-    storage[key] = this.previusValue[key]
+    this.storage[key] = this.previusValue[key]
   }
 
   /**
