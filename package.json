@@ -7,7 +7,8 @@
   "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
     "build": "microbundle --output dist --name reactivePersist src/index.js",
-    "prepublish": "npm run test && npm run build",
+    "precommit": "npm run build && lint-staged",
+    "prepublish": "npm run build",
     "test": "npm run test:jest && npm run test:size",
     "test:jest": "jest --env=jsdom",
     "test:size": "bundlesize",
@@ -28,6 +29,12 @@
   "babel": {
     "presets": [
       "env"
+    ]
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --single-quote --write",
+      "git add"
     ]
   },
   "repository": {
@@ -54,8 +61,11 @@
     "bundlesize": "^0.15.3",
     "dom-storage": "^2.0.2",
     "eslint": "^4.16.0",
+    "husky": "^0.14.3",
     "jest": "^22.1.4",
+    "lint-staged": "^6.1.0",
     "microbundle": "^0.4.3",
+    "prettier": "^1.10.2",
     "vue": "^2.5.13",
     "vuex": "^3.0.1"
   },
