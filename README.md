@@ -56,14 +56,14 @@ const store = new Vuex.Store({
       watch: {
         // keys of the state to watch.
         // all should have functions that accepts three params:
-        //    stateVal: the value in the current state
-        //    savedVal: the value stored in the storage
+        //    current: the new value
+        //    old: the old value
         //    store: the current store object
-        bar: function(stateVal, savedVal, store) {
+        bar: function(current, old, store) {
           console.log('some property has been changed!');
         },
-        'foo.bar': function(stateVal, savedVal, store) {
-          console.log(stateVal, savedVal)
+        'foo.bar': function(current, old, store) {
+          console.log(current, old)
           store.dispatch('some/action')
         }
       },
