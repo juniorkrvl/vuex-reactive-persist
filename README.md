@@ -59,12 +59,12 @@ const store = new Vuex.Store({
         //    stateVal: the value in the current state
         //    savedVal: the value stored in the storage
         //    store: the current store object
-        bar: function(current, saved, store) {
+        bar: function(stateVal, savedVal, store) {
           console.log('some property has been changed!');
         },
-        'foo.bar': function(current, saved, store) {
-          console.log(current, saved)
-          store.dispatch('action')
+        'foo.bar': function(stateVal, savedVal, store) {
+          console.log(stateVal, savedVal)
+          store.dispatch('some/action')
         }
       },
       mutations: [
