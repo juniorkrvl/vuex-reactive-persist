@@ -62,7 +62,7 @@ export default function(options) {
       plugin.storage.on(() => {
         plugin.invokeWatchers({ reverse: true });
         plugin.replaceState();
-      }, watchInterval);
+      }, plugin.watchInterval);
     }
 
     store.subscribe((mutation, state) => {

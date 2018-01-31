@@ -8,6 +8,12 @@ Vue.config.productionTip = false;
 
 Vue.use(Vuex);
 
+function later(delay) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, delay);
+  });
+}
+
 it('can be created with the default options', () => {
   window.localStorage = new Storage();
   expect(() => reactivePersistedState()).not.toThrow();
@@ -248,4 +254,54 @@ it('filters to specific mutations using filter method', () => {
   store._subscribers[0]('filter', { changed: 'state' });
 
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
+});
+
+it('watched keys are being called on mutation', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: { changed: 'saved' } });
+
+  const watchedKey = jest.fn();
+  const options = {
+    storage,
+    watch: { changed: watchedKey }
+  };
+  reactivePersistedState(options)(store);
+
+  store._subscribers[0]('mutation', { changed: 'state' });
+  expect(watchedKey).toBeCalled();
+});
+
+it('watched keys are being called on manual invoke with reverse option', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: { changed: 'saved' } });
+
+  const watchedKey = jest.fn();
+  const options = {
+    storage,
+    watch: { changed: watchedKey }
+  };
+  reactivePersistedState(options)(store);
+
+  storage.setItem('vuex', JSON.stringify({ changed: 'new' }));
+
+  options.invokeWatchers({ reverse: true });
+  expect(watchedKey).toBeCalledWith('new', 'saved', store);
+});
+
+it('watched keys are being from watcher', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: { changed: 'saved' } });
+
+  const watchedKey = jest.fn();
+  const options = {
+    storage,
+    watch: { changed: watchedKey }
+  };
+  reactivePersistedState(options)(store);
+
+  storage.setItem('vuex', JSON.stringify({ changed: 'new' }));
+
+  return later(2000).then(() => {
+    expect(watchedKey).toBeCalledWith('new', 'saved', store);
+  });
 });
