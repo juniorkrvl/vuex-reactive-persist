@@ -81,9 +81,15 @@ const store = new Vuex.Store({
       storage: {
         // Storage to store.
         // Must have getItem, setItem methods
-        getItem: function (key) { return window.localStorage[key]; },
-        setItem: function (key, val) { window.localStorage[key] = val; }
-      }
+        getItem: function (key) {
+          // return item as json string
+        },
+        setItem: function (key, val) {
+          // save json value
+        }
+      },
+      reducer: JSON.stringify // method to convert state to string
+      parser: JSON.parse // method to parse the stored value back to object
     })
   ]
 })
