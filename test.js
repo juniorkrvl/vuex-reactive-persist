@@ -46,50 +46,50 @@ it("does not replaces store's state when receiving invalid JSON", () => {
   expect(store.subscribe).toBeCalled();
 });
 
-// it("does not replaces store's state when receiving null", () => {
-//   const storage = new Storage();
-//   storage.setItem('vuex', JSON.stringify(null));
+it("does not replaces store's state when receiving null", () => {
+  const storage = new Storage();
+  storage.setItem('vuex', JSON.stringify(null));
 
-//   const store = new Vuex.Store({ state: { nested: { original: 'state' } } });
-//   store.replaceState = jest.fn();
-//   store.subscribe = jest.fn();
+  const store = new Vuex.Store({ state: { nested: { original: 'state' } } });
+  store.replaceState = jest.fn();
+  store.subscribe = jest.fn();
 
-//   const plugin = reactivePersistedState({ storage });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage });
+  plugin(store);
 
-//   expect(store.replaceState).not.toBeCalled();
-//   expect(store.subscribe).toBeCalled();
-// });
+  expect(store.replaceState).not.toBeCalled();
+  expect(store.subscribe).toBeCalled();
+});
 
-// it("respects nested values when it replaces store's state on initializing", () => {
-//   const storage = new Storage();
-//   storage.setItem('vuex', JSON.stringify({ persisted: 'json' }));
+it("respects nested values when it replaces store's state on initializing", () => {
+  const storage = new Storage();
+  storage.setItem('vuex', JSON.stringify({ persisted: 'json' }));
 
-//   const store = new Vuex.Store({ state: { original: 'state' } });
-//   store.replaceState = jest.fn();
-//   store.subscribe = jest.fn();
+  const store = new Vuex.Store({ state: { original: 'state' } });
+  store.replaceState = jest.fn();
+  store.subscribe = jest.fn();
 
-//   const plugin = reactivePersistedState({ storage });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage });
+  plugin(store);
 
-//   expect(store.replaceState).toBeCalledWith({
-//     original: 'state',
-//     persisted: 'json'
-//   });
-//   expect(store.subscribe).toBeCalled();
-// });
+  expect(store.replaceState).toBeCalledWith({
+    original: 'state',
+    persisted: 'json'
+  });
+  expect(store.subscribe).toBeCalled();
+});
 
-// it('should persist the changed parial state back to serialized JSON', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
+it('should persist the changed parial state back to serialized JSON', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
 
-//   const plugin = reactivePersistedState({ storage, paths: ['changed'] });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage, paths: ['changed'] });
+  plugin(store);
 
-//   store._subscribers[0]('mutation', { changed: 'state' });
+  store._subscribers[0]('mutation', { changed: 'state' });
 
-//   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
-// });
+  expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
+});
 
 // it('persist the changed partial state back to serialized JSON under a configured key', () => {
 //   const storage = new Storage();
