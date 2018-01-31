@@ -7,8 +7,7 @@
   "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
     "build": "microbundle --output dist --name reactivePersistedState index.js",
-    "precommit": "lint-staged",
-    "prepublish": "npm run build",
+    "prepublish": "npm run test && npm run build",
     "test": "npm run test:jest && npm run test:size",
     "test:jest": "jest --env=jsdom",
     "test:size": "bundlesize"
@@ -17,12 +16,6 @@
   "module": "dist/vuex-reactive-persist.es.js",
   "jsnext:main": "dist/vuex-reactive-persist.es.js",
   "umd:main": "dist/vuex-reactive-persist.umd.js",
-  "lint-staged": {
-    "*.js": [
-      "prettier --single-quote --write",
-      "git add"
-    ]
-  },
   "bundlesize": [
     {
       "path": "./dist/*.js",
@@ -53,17 +46,13 @@
     "url": "https://github.com/dipu-bd/vuex-reactive-persist/issues"
   },
   "devDependencies": {
-    "babel-eslint": "^8.0.3",
     "babel-jest": "^22.1.0",
     "babel-preset-env": "^1.6.1",
     "bundlesize": "^0.15.3",
     "dom-storage": "^2.0.2",
     "eslint": "^4.16.0",
-    "husky": "^0.14.3",
     "jest": "^22.1.4",
-    "lint-staged": "^6.1.0",
     "microbundle": "^0.4.3",
-    "prettier": "^1.10.2",
     "vue": "^2.5.13",
     "vuex": "^3.0.1"
   },
