@@ -58,11 +58,11 @@ export default function(options) {
     plugin.initialized && plugin.initialized(store);
 
     // watch storage value change
-    if (!plugin.disableWatch) {
+    if (!plugin.watchInterval) {
       plugin.storage.on(() => {
         plugin.invokeWatchers({ reverse: true });
         plugin.replaceState();
-      });
+      }, watchInterval);
     }
 
     store.subscribe((mutation, state) => {

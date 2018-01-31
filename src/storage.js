@@ -30,13 +30,14 @@ export default class Storage {
     }
   }
 
-  on(callback) {
+  on(callback, interval) {
     // watch every 1000s for changed values
     setInterval(() => {
       const saved = this.storage.getItem(this.key);
       if (this.previousValue !== saved) {
+        this.previousValue = saved;
         callback();
       }
-    }, 1000);
+    }, interval);
   }
 }
