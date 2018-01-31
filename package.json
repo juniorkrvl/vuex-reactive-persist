@@ -53,6 +53,7 @@
     "url": "https://github.com/dipu-bd/vuex-reactive-persist/issues"
   },
   "devDependencies": {
+    "babel-eslint": "^8.0.3",
     "babel-jest": "^22.1.0",
     "babel-preset-env": "^1.6.1",
     "bundlesize": "^0.15.3",
@@ -69,5 +70,8 @@
   "peerDependencies": {
     "vue": "^2.0.0",
     "vuex": "^2.0.0 || ^3.0.0"
+  },
+  "dependencies": {
+    "dotty": "0.0.2"
   }
 }
