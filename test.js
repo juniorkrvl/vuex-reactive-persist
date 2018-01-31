@@ -196,42 +196,6 @@ it('should not clone circular objects when rehydrating', () => {
   expect(store.subscribe).toBeCalled();
 });
 
-// it('persist the changed state back through the configured setter', () => {
-//   expect.assertions(1);
-
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
-
-//   const plugin = reactivePersistedState({
-//     storage,
-//     setState: (key, state) => {
-//       expect(state).toEqual({ setter: 'item' });
-//     }
-//   });
-
-//   plugin(store);
-
-//   store._subscribers[0]('mutation', { setter: 'item' });
-// });
-
-// it('uses the configured reducer when persisting the state', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
-
-//   const customReducer = jest.fn();
-
-//   const plugin = reactivePersistedState({
-//     storage,
-//     paths: ['custom'],
-//     reducer: customReducer
-//   });
-//   plugin(store);
-
-//   store._subscribers[0]('mutation', { custom: 'value' });
-
-//   expect(customReducer).toBeCalledWith({ custom: 'value' }, ['custom']);
-// });
-
 it('filters to specific mutations', () => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: {} });
