@@ -1,10 +1,9 @@
 import dotty from 'dotty';
 
 export default class Storage {
-  constructor({ key, storage, reducer, parser, disableWatch }) {
+  constructor({ key, storage, reducer, parser }) {
     this.key = key || 'vuex';
     this.previousValue = '';
-    this.watchers = [];
 
     this.reducer = reducer || JSON.stringify;
     this.parser = parser || JSON.parse;
@@ -12,15 +11,6 @@ export default class Storage {
       getItem: k => window.localStorage[k],
       setItem: (k, v) => (window.localStorage[k] = v)
     };
-
-    // watch every 1000s for changed values
-    if (!disableWatch) {
-      setInterval(() => {
-        if (this.previousValue !== this.storage.getItem(this.key)) {
-          this.watchers.forEach(f => f());
-        }
-      }, 1000);
-    }
   }
 
   getState() {
@@ -41,17 +31,12 @@ export default class Storage {
   }
 
   on(callback) {
-    if (callback && callback instanceof Function) {
-      this.watchers.push(callback);
-      return true;
-    }
-    return false;
-  }
-
-  off(callback) {
-    const index = this.watchers.indexOf(callback);
-    if (index < 0) return false;
-    this.watchers.splice(index, 1);
-    return true;
+    // watch every 1000s for changed values
+    setInterval(() => {
+      const saved = this.storage.getItem(this.key);
+      if (this.previousValue !== saved) {
+        callback();
+      }
+    }, 1000);
   }
 }
