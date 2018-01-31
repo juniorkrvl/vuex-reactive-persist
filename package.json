@@ -7,7 +7,7 @@
   "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
     "build": "microbundle --output dist --name reactivePersistedState index.js",
-    "precommit": "npm run build && lint-staged",
+    "precommit": "lint-staged",
     "prepublish": "npm run build",
     "test": "npm-run-all test:**",
     "test:jest": "jest --env=jsdom",
