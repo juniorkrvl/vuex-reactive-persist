@@ -196,7 +196,26 @@ it('should not clone circular objects when rehydrating', () => {
   expect(store.subscribe).toBeCalled();
 });
 
-it('filters to specific mutations', () => {
+it('filters to specific mutations with mutations', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
+
+  const plugin = reactivePersistedState({
+    storage,
+    mutations: ['filter']
+  });
+  plugin(store);
+
+  store._subscribers[0]('mutation', { changed: 'state' });
+
+  expect(storage.getItem('vuex')).toBe('{}')
+
+  store._subscribers[0]('filter', { changed: 'state' });
+
+  expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
+});
+
+it('filters to specific mutations using filter method', () => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: {} });
 

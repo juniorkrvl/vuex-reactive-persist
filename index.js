@@ -18,7 +18,7 @@ export default function(options) {
   }
 
   // filters the mutation type
-  filter = filter || (x => !mutations || mutations.indexOf(x && x.type) >= 0);
+  filter = filter || (x => !mutations || mutations.indexOf(x) >= 0);
 
   // replace the current state with new state from storage
   const replaceState = store => {
@@ -58,7 +58,7 @@ export default function(options) {
 
     store.subscribe((mutation, state) => {
       // check if mutation type should be considered
-      if (!filter(mutation)) return;
+      if (!filter(mutation.type || mutation)) return;
       // find current changes
       const hasChange = invokeWatchers(store, state);
       // save only on change
