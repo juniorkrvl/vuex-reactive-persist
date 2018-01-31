@@ -1,3 +1,4 @@
+import dotty from 'dotty';
 import Storage from './storage';
 
 export default function(options) {
@@ -8,12 +9,14 @@ export default function(options) {
   // filters the mutation type
   const filter =
     options.filter ||
-    (type => !options.mutations || options.mutations.indexOf(type) >= 0);
+    (type =>
+      !type || !options.mutations || options.mutations.indexOf(type) >= 0);
 
   // replace the current state with new state from storage
   const replaceState = store => {
     const savedState = storage.get(key);
-    if (!savedState || !Object.keys(savedState).length) return;
+    if (!savedState) return;
+    (options.paths || []).forEach(key => savedState.set(key, null));
     store.replaceState(Object.assign(store.state, savedState));
   };
 
@@ -22,12 +25,13 @@ export default function(options) {
     let hasChange = false;
     state = state || store.state;
     const prev = storage.get(key) || {};
-    const paths = options.paths || Object.keys(state);
-    paths.forEach(path => {
-      if (prev[path] === state[path]) return;
+    (options.paths || dotty.deepKeys(state)).forEach(path => {
+      const curVal = dotty.get(prev, path);
+      const oldVal = dotty.get(state, path);
+      if (curVal === oldVal) return;
       hasChange = true;
       if (options.watch && options.watch[path]) {
-        options.watch[path](state[path], prev[path], store);
+        options.watch[path](curVal, oldVal, store);
       }
     });
     return hasChange;
@@ -51,14 +55,14 @@ export default function(options) {
       const hasChange = invokeWatchers(store, state);
       // save only on change
       if (!hasChange) return;
-      let picked = {};
-      (options.paths || Object.keys(state)).forEach(key => {
-        let sub = picked;
-        key.split('.').forEach(x => {
-          sub[x] = state[x];
-          sub = sub[x];
+      let picked = state;
+      if (options.paths) {
+        picked = {};
+        options.paths.forEach(key => {
+          const val = dotty.get(state, key);
+          dotty.put(picked, key, val);
         });
-      });
+      }
       storage.set(key, picked);
     });
   };

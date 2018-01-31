@@ -136,25 +136,25 @@ it('persist the changed partial state back to serialized JSON under a nested pat
   );
 });
 
-// it('should not persist null values', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({
-//     state: { alpha: { name: null, bravo: { name: null } } }
-//   });
+it('should not persist null values', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({
+    state: { alpha: { name: null, bravo: { name: null } } }
+  });
 
-//   const plugin = reactivePersistedState({
-//     storage,
-//     paths: ['alpha.name', 'alpha.bravo.name']
-//   });
+  const plugin = reactivePersistedState({
+    storage,
+    paths: ['alpha.name', 'alpha.bravo.name']
+  });
 
-//   plugin(store);
+  plugin(store);
 
-//   store._subscribers[0]('mutation', { charlie: { name: 'charlie' } });
+  store._subscribers[0]('mutation', { charlie: { name: 'charlie' } });
 
-//   expect(storage.getItem('vuex')).toBe(
-//     JSON.stringify({ alpha: { bravo: {} } })
-//   );
-// });
+  expect(storage.getItem('vuex')).toBe(
+    JSON.stringify({ alpha: { bravo: { name: null } } })
+  );
+});
 
 // it('should not merge array values when rehydrating', () => {
 //   const storage = new Storage();

@@ -51,11 +51,8 @@ export default class Storage {
    * @param {*Any} val Value to store
    */
   set(key, val) {
-    try {
-      this.previusValue[key] = val;
-      this.storage.setItem(key, this.reducer(this.previusValue[key]));
-    } finally {
-    }
+    this.previusValue[key] = val;
+    this.storage.setItem(key, this.reducer(this.previusValue[key]));
   }
 
   /**
