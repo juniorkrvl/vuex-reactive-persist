@@ -9,8 +9,8 @@ export default function(opt) {
 
   // filters the mutation type
   if (!(opt.filter instanceof Function)) {
-    let arr = opt.filter;
-    opt.filter = x => !arr || arr(x) >= 0;
+    const arr = opt.filter;
+    opt.filter = x => !arr || arr.indexOf(x) >= 0;
   }
 
   // replace the current state with new state from storage

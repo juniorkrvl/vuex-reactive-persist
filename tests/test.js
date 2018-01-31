@@ -217,13 +217,13 @@ it('should not clone circular objects when rehydrating', () => {
   expect(store.subscribe).toBeCalled();
 });
 
-it('works using watch array option', () => {
+it('works using filter array', () => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: {} });
 
   const plugin = reactivePersistedState({
     storage,
-    watch: ['filter', 'foo/me']
+    filter: ['filter', 'foo/me']
   });
   plugin(store);
 
@@ -237,13 +237,13 @@ it('works using watch array option', () => {
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'me' }));
 });
 
-it('works using filter method', () => {
+it('works using filter functon', () => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: {} });
 
   const plugin = reactivePersistedState({
     storage,
-    filter: mutation => ['filter'].indexOf(mutation) < 0
+    filter: mutation => ['filter'].indexOf(mutation) >= 0
   });
   plugin(store);
 
@@ -261,7 +261,7 @@ it('can properly use watch object on mutation', () => {
   const watchedKey = jest.fn();
   const options = {
     storage,
-    watch: { mutation: watchedKey }
+    watch: watchedKey
   };
   reactivePersistedState(options)(store);
 
@@ -269,7 +269,7 @@ it('can properly use watch object on mutation', () => {
   expect(storage.getItem('vuex')).toBe(
     JSON.stringify({ changed: { foo: 'bar' } })
   );
-  expect(watchedKey).toBeCalledWith(store, { changed: { foo: 'bar' } });
+  expect(watchedKey).toBeCalled();
 });
 
 it('replaces nested object value on change in storage', done => {

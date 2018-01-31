@@ -54,30 +54,22 @@ const store = new Vuex.Store({
         'bar',
         'foo.bar'
       ],
-      watch:
-        // List of mutations to monitor. Either Object or Array.
-        // If `filter` method is provided this will be ignored.
-        // -- Not related with `watchInterval` --
-        [
-          'updateBar',
-          'foo/setBar'
-        ]
-        // Or,
-        {
-          updateBar: function (store, newSate) {
-            console.log('some property has been changed!');
-          },
-          'foo/setBar': function (store, newSate) {
-            store.dispatch('some/action')
-          }
-        }
-        // Or,
-        null // to monitor all mutations
-      ,
+      filter: [
+        // List of mutations to monitor.
+        'updateBar',
+        'foo/setBar'
+      ],
       filter: function(mutation) {
         // A function that will be called to filter any mutations which will trigger.
-        // mutations options will be ignored if this method exists
         return ['filter'].indexOf(mutation.type) >= 0
+      },
+      mutation: function(mutation, state, store) {
+        // Called when a mutation occurs. Here,
+        //    mutation: {type, payload} object
+        //    state: the new state
+        //    store: parent store
+        console.log('some property has been changed!');
+        store.dispatch('some/action')
       },
       storage: {
         // Storage to store. Uses window.localStorage by default
