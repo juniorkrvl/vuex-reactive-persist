@@ -1,7 +1,7 @@
 import dotty from 'dotty';
 
 export default class Storage {
-  constructor({ key, storage, reducer, parser }) {
+  constructor({ key, storage, reducer, parser, disableWatch }) {
     this.key = key || 'vuex';
     this.previousValue = '';
     this.watchers = [];
@@ -14,11 +14,13 @@ export default class Storage {
     };
 
     // watch every 1000s for changed values
-    setInterval(() => {
-      if (this.previousValue !== this.storage.get(this.key)) {
-        this.watchers.forEach(f => f());
-      }
-    }, 1000);
+    if (disableWatch) {
+      setInterval(() => {
+        if (this.previousValue !== this.storage.get(this.key)) {
+          this.watchers.forEach(f => f());
+        }
+      }, 1000);
+    }
   }
 
   getState() {
