@@ -156,60 +156,45 @@ it('should not persist null values', () => {
   );
 });
 
-// it('should not merge array values when rehydrating', () => {
-//   const storage = new Storage();
-//   storage.setItem('vuex', JSON.stringify({ persisted: ['json'] }));
+it('should not merge array values when rehydrating', () => {
+  const storage = new Storage();
+  storage.setItem('vuex', JSON.stringify({ persisted: ['json'] }));
 
-//   const store = new Vuex.Store({ state: { persisted: ['state'] } });
-//   store.replaceState = jest.fn();
-//   store.subscribe = jest.fn();
+  const store = new Vuex.Store({ state: { persisted: ['state'] } });
+  store.replaceState = jest.fn();
+  store.subscribe = jest.fn();
 
-//   const plugin = reactivePersistedState({ storage });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage });
+  plugin(store);
 
-//   expect(store.replaceState).toBeCalledWith({
-//     persisted: ['json'],
-//   });
+  expect(store.replaceState).toBeCalledWith({
+    persisted: ['json'],
+  });
 
-//   expect(store.subscribe).toBeCalled();
-// });
+  expect(store.subscribe).toBeCalled();
+});
 
-// it('should not clone circular objects when rehydrating', () => {
-//   const circular = { foo: 'bar' };
-//   circular.foo = circular;
+it('should not clone circular objects when rehydrating', () => {
+  const circular = { foo: 'bar' };
+  circular.foo = circular;
 
-//   const storage = new Storage();
-//   storage.setItem('vuex', JSON.stringify({ persisted: 'baz' }));
+  const storage = new Storage();
+  storage.setItem('vuex', JSON.stringify({ persisted: 'baz' }));
 
-//   const store = new Vuex.Store({ state: { circular } });
-//   store.replaceState = jest.fn();
-//   store.subscribe = jest.fn();
+  const store = new Vuex.Store({ state: { circular } });
+  store.replaceState = jest.fn();
+  store.subscribe = jest.fn();
 
-//   const plugin = reactivePersistedState({ storage });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage });
+  plugin(store);
 
-//   expect(store.replaceState).toBeCalledWith({
-//     circular,
-//     persisted: 'baz',
-//   });
+  expect(store.replaceState).toBeCalledWith({
+    circular,
+    persisted: 'baz',
+  });
 
-//   expect(store.subscribe).toBeCalled();
-// });
-
-// it("rehydrates store's state through the configured getter", () => {
-//   const storage = new Storage();
-
-//   const store = new Vuex.Store({ state: {} });
-//   store.replaceState = jest.fn();
-
-//   const plugin = reactivePersistedState({
-//     storage,
-//     getState: () => ({ getter: 'item' })
-//   });
-//   plugin(store);
-
-//   expect(store.replaceState).toBeCalledWith({ getter: 'item' });
-// });
+  expect(store.subscribe).toBeCalled();
+});
 
 // it('persist the changed state back through the configured setter', () => {
 //   expect.assertions(1);
@@ -247,21 +232,21 @@ it('should not persist null values', () => {
 //   expect(customReducer).toBeCalledWith({ custom: 'value' }, ['custom']);
 // });
 
-// it('filters to specific mutations', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
+it('filters to specific mutations', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
 
-//   const plugin = reactivePersistedState({
-//     storage,
-//     filter: mutation => ['filter'].indexOf(mutation) !== -1
-//   });
-//   plugin(store);
+  const plugin = reactivePersistedState({
+    storage,
+    filter: mutation => ['filter'].indexOf(mutation) !== -1
+  });
+  plugin(store);
 
-//   store._subscribers[0]('mutation', { changed: 'state' });
+  store._subscribers[0]('mutation', { changed: 'state' });
 
-//   expect(storage.getItem('vuex')).toBeNull();
+  expect(storage.getItem('vuex')).toBe('{}')
 
-//   store._subscribers[0]('filter', { changed: 'state' });
+  store._subscribers[0]('filter', { changed: 'state' });
 
-//   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
-// });
+  expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
+});
