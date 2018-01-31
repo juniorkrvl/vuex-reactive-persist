@@ -6,7 +6,7 @@
   "license": "MIT",
   "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
-    "build": "microbundle --output dist --name reactivePersistedState src/index.js",
+    "build": "microbundle --output dist --name reactivePersist src/index.js",
     "prepublish": "npm run test && npm run build",
     "test": "npm run test:jest && npm run test:size",
     "test:jest": "jest --env=jsdom",
