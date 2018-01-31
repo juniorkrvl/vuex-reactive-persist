@@ -37,7 +37,6 @@ export default class Storage {
    * @param {*Any} def Default value
    */
   get(key) {
-    console.log('>>>', key, this.storage.getItem(key));
     const val = this.parser(this.storage.getItem(key));
     this.previusValue[key] = val || this.previusValue[key];
     return this.previusValue[key];
