@@ -48,7 +48,7 @@ can be provided to configure the plugin for your specific needs:
 
 ### More on `watch` feature
 
-The module automatically watches for changes. You can listen to them by passing keys to `watch` option. This method is called whenever the mutation updates the value or the storage observer detects changes.
+The module automatically watches for changes. A method `watch` in option is called whenever the storage observer detects changes, or the mutation updates the *value* of the *key* corresponding to the method name.
 
 Suppose you have vuex store having state like this:
 
