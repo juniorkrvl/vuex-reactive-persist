@@ -2,7 +2,7 @@
 
 Persist [Vuex](http://vuex.vuejs.org/) state with [localStorage](https://developer.mozilla.org/nl/docs/Web/API/Window/localStorage) and observe changes from outside the current vue instance.
 
-This module is helpful in case you want pass your changed state across multiple open tabs.
+This module is helpful in case you want to retain changes to your vuex state across multiple opened tabs.
 
 > It has some inspiration from [vuex-persistedstate](https://github.com/robinvdvleuten/vuex-persistedstate)
 
@@ -14,7 +14,7 @@ This module is helpful in case you want pass your changed state across multiple 
 ## Installation
 
 ```bash
-npm install vuex-reactive-persist
+npm install vuex-reactive-persist --save
 ```
 
 ## Usage
