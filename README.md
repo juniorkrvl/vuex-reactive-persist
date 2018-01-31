@@ -42,7 +42,7 @@ can be provided to configure the plugin for your specific needs:
 - `storage <Object>`: Storage to store. It must have `getItem` and `setItem` methods. Defaults to localStorage.
 - `filter <Function>`: A function that will be called to filter any mutations which will trigger. You can also pass `mutations` instead.
 - `mutations <Array>`: List of mutations to monitor. If `filter` method is provided this will be ignored.
-- `watch <Object>`: Prove keys to observe for changes. Keys should be functions that accepts three params: `stateVal`, `savedVal`, `store`.
+- `watch <Object>`: Keys should be functions that accepts three params: `stateVal`, `savedVal`, `store`.
 - `initialized <Function>`: This is called right after the `store` is replaced with saved value. It provided the `store` as argument.
 - `disableWatch <Boolean>`: Pass `true` if you don't want your storage to be observed for value changes. The `watch` option still works. (default: `false`)
 
