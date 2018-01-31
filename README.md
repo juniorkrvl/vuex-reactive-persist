@@ -80,7 +80,7 @@ const store = new Vuex.Store({
         return ['filter'].indexOf(mutation.type) >= 0
       },
       storage: {
-        // Storage to store.
+        // Storage to store. Uses window.localStorage by default
         // Must have getItem, setItem methods
         getItem: function (key) {
           // return item as json string

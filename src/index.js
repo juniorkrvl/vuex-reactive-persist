@@ -1,50 +1,49 @@
-import dotty from 'dotty';
+import dot from './doto';
 import Storage from './storage';
 
-export default function(options) {
-  const plugin = options || {};
-  plugin.storage = new Storage(plugin);
-  plugin.watchInterval = plugin.watchInterval || 1000;
-
-  // make options paths available
-  plugin.initializeStorage = () => {
-    const val = plugin.storage.getState() || {};
-    (plugin.paths || []).forEach(key => {
-      if (!dotty.exists(val, key)) {
-        dotty.put(val, key, null);
-      }
-    });
-    plugin.storage.setState(val);
-  };
+export default function(opt) {
+  opt = opt || {};
+  opt.storage = new Storage(opt);
+  opt.watchInterval = opt.watchInterval || 1000;
 
   // filters the mutation type
-  plugin.filter =
-    plugin.filter ||
-    (x => !plugin.mutations || plugin.mutations.indexOf(x) >= 0);
+  opt.filter =
+    opt.filter || (x => !opt.mutations || opt.mutations.indexOf(x) >= 0);
 
   // replace the current state with new state from storage
-  plugin.replaceState = () => {
-    const savedState = plugin.storage.getState();
+  opt.replaceState = () => {
+    const savedState = opt.storage.getState();
     if (!savedState) return;
-    const mergedState = Object.assign({}, plugin.store.state, savedState);
-    plugin.store.replaceState(mergedState);
+    const mergedState = Object.assign({}, opt.store.state, savedState);
+    opt.store.replaceState(mergedState);
+  };
+
+  // stores the current state
+  opt.storeState = state => {
+    state = state || opt.store.state;
+    let picked = opt.paths ? {} : state;
+    opt.paths &&
+      opt.paths.forEach(path => {
+        dot.set(picked, path, dot.get(state, path));
+      });
+    opt.storage.setState(picked);
   };
 
   // find changes between previous and current state and callback watches
-  plugin.invokeWatchers = ({ state, reverse }) => {
+  opt.invokeWatchers = ({ state, reverse }) => {
     let hasChange = false;
-    state = state || plugin.store.state;
-    const prevState = plugin.storage.getState() || {};
-    (plugin.paths || dotty.deepKeys(state)).forEach(path => {
-      const stateVal = dotty.get(state, path);
-      const savedVal = dotty.get(prevState, path);
+    state = state || opt.store.state;
+    const prevState = opt.storage.getState() || {};
+    (opt.paths || dot.keys(state)).forEach(path => {
+      const stateVal = dot.get(state, path);
+      const savedVal = dot.get(prevState, path);
       if (stateVal === savedVal) return;
       hasChange = true;
-      if (plugin.watch && plugin.watch[path]) {
-        plugin.watch[path](
+      if (dot.has(opt.watch, path)) {
+        dot.get(opt.watch, path)(
           reverse ? savedVal : stateVal,
           reverse ? stateVal : savedVal,
-          plugin.store
+          opt.store
         );
       }
     });
@@ -52,36 +51,28 @@ export default function(options) {
   };
 
   return function(store) {
-    plugin.store = store;
+    opt.store = store;
     // restore state
-    plugin.replaceState();
-    plugin.initializeStorage();
-    plugin.initialized && plugin.initialized(store);
+    opt.replaceState();
+    opt.storeState();
+    opt.initialized && opt.initialized(store);
 
     // watch storage value change
-    if (plugin.watchInterval >= 0) {
-      plugin.storage.on(() => {
-        plugin.invokeWatchers({ reverse: true });
-        plugin.replaceState();
-      }, plugin.watchInterval);
+    if (opt.watchInterval >= 0) {
+      opt.storage.on(() => {
+        opt.invokeWatchers({ reverse: true });
+        opt.replaceState();
+      }, opt.watchInterval);
     }
 
     store.subscribe((mutation, state) => {
       // check if mutation type should be considered
-      if (!plugin.filter(mutation.type || mutation)) return;
+      if (!opt.filter(mutation.type || mutation)) return;
       // find current changes
-      const hasChange = plugin.invokeWatchers({ state });
+      const hasChange = opt.invokeWatchers({ state });
       // save only on change
       if (!hasChange) return;
-      let picked = state;
-      if (options.paths) {
-        picked = {};
-        options.paths.forEach(key => {
-          const val = dotty.get(state, key);
-          dotty.put(picked, key, val);
-        });
-      }
-      plugin.storage.setState(picked);
+      opt.storeState(state);
     });
   };
 }

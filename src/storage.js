@@ -1,9 +1,7 @@
-import dotty from 'dotty';
-
 export default class Storage {
   constructor({ key, storage, reducer, parser }) {
     this.key = key || 'vuex';
-    this.previousValue = '';
+    this.previousValue = '{}';
 
     this.reducer = reducer || JSON.stringify;
     this.parser = parser || JSON.parse;
@@ -25,6 +23,7 @@ export default class Storage {
   setState(val) {
     try {
       this.previousValue = this.reducer(val);
+    } catch (err) {
     } finally {
       this.storage.setItem(this.key, this.previousValue);
     }
@@ -36,7 +35,7 @@ export default class Storage {
       const saved = this.storage.getItem(this.key);
       if (this.previousValue !== saved) {
         this.previousValue = saved;
-        callback();
+        callback(this.parser(saved), this.parser(this.previousValue));
       }
     }, interval || 1000);
   }

@@ -74,6 +74,10 @@
     "vuex": "^2.0.0 || ^3.0.0"
   },
   "dependencies": {
-    "dotty": "0.0.2"
+    "dot-prop": "^4.2.0",
+    "dotty": "0.0.2",
+    "get-value": "^3.0.0",
+    "has-value": "^2.0.1",
+    "set-value": "^2.0.0"
   }
 }
