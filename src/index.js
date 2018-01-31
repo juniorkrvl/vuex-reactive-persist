@@ -16,11 +16,7 @@ export default function(opt) {
       if (Array.isArray(opt.watch)) {
         return opt.watch.indexOf(type) < 0;
       }
-      if (type in opt.watch) {
-        opt.watch[type](opt.store);
-        return false;
-      }
-      return true;
+      return !(type in opt.watch);
     };
 
   // replace the current state with new state from storage
@@ -60,6 +56,7 @@ export default function(opt) {
     store.subscribe((mutation, state) => {
       if (opt.filter(mutation)) return;
       opt.storeState(state);
+      opt.watch[type] && opt.watch[type](store, state);
     });
   };
 }

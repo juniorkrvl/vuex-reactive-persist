@@ -64,10 +64,10 @@ const store = new Vuex.Store({
         ]
         // Or,
         {
-          updateBar: function (store) {
+          updateBar: function (store, newSate) {
             console.log('some property has been changed!');
           },
-          'foo/setBar': function (store) {
+          'foo/setBar': function (store, newSate) {
             store.dispatch('some/action')
           }
         }
