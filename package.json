@@ -18,7 +18,7 @@
   "jsnext:main": "dist/vuex-reactive-persist.es.js",
   "umd:main": "dist/vuex-reactive-persist.umd.js",
   "lint-staged": {
-    "index.js": [
+    "*.js": [
       "prettier --single-quote --write",
       "git add"
     ]
@@ -63,7 +63,6 @@
     "lint-staged": "^6.1.0",
     "microbundle": "^0.4.3",
     "prettier": "^1.10.2",
-    "rimraf": "^2.6.2",
     "vue": "^2.5.13",
     "vuex": "^3.0.1"
   },
