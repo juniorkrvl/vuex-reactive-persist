@@ -16,7 +16,7 @@ export default class Storage {
     // watch every 1000s for changed values
     if (!disableWatch) {
       setInterval(() => {
-        if (this.previousValue !== this.storage.get(this.key)) {
+        if (this.previousValue !== this.storage.getItem(this.key)) {
           this.watchers.forEach(f => f());
         }
       }, 1000);
