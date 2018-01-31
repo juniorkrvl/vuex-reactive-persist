@@ -359,7 +359,7 @@ it('calls nested watch methods on change in storage', done => {
   storage.setItem('vuex', JSON.stringify({ foo: { bar: 2 } }));
 
   return later(25).then(() => {
-    expect(watchedKey).toBeCalled(); //With(2, 5, store);
+    expect(watchedKey).toBeCalledWith(2, 5, store);
     done();
   });
 });
@@ -379,7 +379,7 @@ it('calls watch methods on deleting nested value in the storage', done => {
   storage.setItem('vuex', JSON.stringify({ foo: {} }));
 
   return later(25).then(() => {
-    expect(watchedKey).toBeCalled(); //With(null, 5, store);
+    expect(watchedKey).toBeCalledWith(undefined, 5, store);
     done();
   });
 });
