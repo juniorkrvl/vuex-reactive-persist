@@ -1,83 +1,56 @@
-export default class Storage {
-  /**
-   * Creates a new instance of Storage
-   * @param {*Object} options {
-   *    storage: Use custom storage. Must have get/set methods accepting key as parameter.
-   *    reducer: Reduces the value to string,
-   *    parser: Parses the value from string
-   * }
-   */
-  constructor({ storage, reducer, parser }) {
-    this.reducer = reducer || (v => JSON.stringify(v || ''));
-    this.parser = parser || (v => JSON.parse(v || ''));
-    this.previusValue = {};
-    this.watchers = {};
+import dotty from 'dotty';
 
+export default class Storage {
+  constructor({ key, storage, reducer, parser }) {
+    this.key = key || 'vuex';
+    this.previousValue = '';
+    this.watchers = [];
+
+    this.reducer = reducer || JSON.stringify;
+    this.parser = parser || JSON.parse;
     this.storage = storage || {
-      getItem: key => window.localStorage[key],
-      setItem: (key, val) => (window.localStorage[key] = val)
+      getItem: k => window.localStorage[k],
+      setItem: (k, v) => window.localStorage[k] = v
     };
 
-    // watch every 1000s
-    setInterval(this._callWatchers, 1000);
-  }
-
-  // Call every watcher that has changed values
-  _callWatchers() {
-    Object.keys(this.watchers).forEach(key => {
-      if (this.previusValue[key] !== this.storage.getItem(key)) {
-        this.watchers[key].forEach(f => f());
+    // watch every 1000s for changed values
+    setInterval(() => {
+      if (this.previousValue !== this.storage.get(this.key)) {
+        this.watchers.forEach(f => f());
       }
-    });
+    }, 1000);
   }
 
-  /**
-   * Gets a value from local-storage by key
-   * @param {*String} key Key name
-   * @param {*Any} def Default value
-   */
-  get(key) {
+  getState() {
     try {
-      const val = this.parser(this.storage.getItem(key));
-      this.previusValue[key] = val || this.previusValue[key];
+      this.previousValue = this.storage.getItem(this.key);
+      return this.parser(this.previousValue);
+    } catch (err) {
+      this.storage.setItem(this.key, '');
+      return null;
+    }
+  }
+
+  setState(val) {
+    try {
+      this.previousValue = this.reducer(val);
     } finally {
-      return this.previusValue[key];
+      this.storage.setItem(this.key, this.previousValue);
     }
   }
 
-  /**
-   * Sets a value to local storage
-   * @param {*String} key Key name
-   * @param {*Any} val Value to store
-   */
-  set(key, val) {
-    this.previusValue[key] = val;
-    this.storage.setItem(key, this.reducer(this.previusValue[key]));
-  }
-
-  /**
-   * Adds watcher for value change of a key
-   * @param {*String} key
-   * @param {*Function} callback
-   */
-  on(key, callback) {
+  on(callback) {
     if (callback && callback instanceof Function) {
-      this.watchers[key] = this.watchers[key] || [];
-      this.watchers[key].push(callback);
-      return true;
+      this.watchers.push(callback)
+      return true
     }
-    return false;
+    return false
   }
 
-  /**
-   * Removes a watcher
-   * @param {*String} key
-   * @param {*Function} callback
-   */
-  off(key, callback) {
-    const index = this.watchers[key].indexOf(callback);
-    if (index < 0) return false;
-    this.watchers.splice(index, 1);
-    return true;
+  off(callback) {
+    const index = this.watchers.indexOf(callback)
+    if (index < 0) return false
+    this.watchers.splice(index, 1)
+    return true
   }
 }

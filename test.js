@@ -152,7 +152,7 @@ it('should not persist null values', () => {
   store._subscribers[0]('mutation', { charlie: { name: 'charlie' } });
 
   expect(storage.getItem('vuex')).toBe(
-    JSON.stringify({ alpha: { bravo: { name: null } } })
+    JSON.stringify({ alpha: { bravo: { } } })
   );
 });
 
