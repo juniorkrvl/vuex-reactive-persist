@@ -1,5 +1,5 @@
 import LocalStorage from './src/storage';
-import { pick } from './src/utils';
+import { pick, deepCopy } from './src/utils';
 
 export default function(options) {
   options = options || {};
@@ -15,7 +15,7 @@ export default function(options) {
 
   // replace the current state with new state from storage
   const replaceState = store => {
-    const old = { ...store.state };
+    const old = deepCopy(store.state);
     const current = storage.get(key);
     store.replaceState(Object.assign(old, current));
   };
