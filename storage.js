@@ -8,14 +8,14 @@ export default class Storage {
    * }
    */
   constructor({ storage, reducer, parser }) {
-    this.reducer = reducer || (v => JSON.stringify(v));
-    this.parser = parser || (v => JSON.parse(v));
+    this.reducer = reducer || (v => JSON.stringify(v || ''));
+    this.parser = parser || (v => JSON.parse(v || ''));
     this.previusValue = {};
     this.watchers = {};
 
-    this.storage = this.storage || {
+    this.storage = storage || {
       getItem: key => window.localStorage[key],
-      setItem: (key, val) => window.localStorage[(key, val)]
+      setItem: (key, val) => (window.localStorage[key] = val)
     };
 
     // watch every 1000s
@@ -37,6 +37,7 @@ export default class Storage {
    * @param {*Any} def Default value
    */
   get(key) {
+    console.log('>>>', key, this.storage.getItem(key));
     const val = this.parser(this.storage.getItem(key));
     this.previusValue[key] = val || this.previusValue[key];
     return this.previusValue[key];
@@ -59,6 +60,7 @@ export default class Storage {
    */
   on(key, callback) {
     if (callback && callback instanceof Function) {
+      this.watchers[key] = this.watchers[key] || [];
       this.watchers[key].push(callback);
       return true;
     }

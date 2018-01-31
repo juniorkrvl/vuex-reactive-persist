@@ -6,25 +6,26 @@
       : (t.reactivePersistedState = e());
 })(this, function() {
   var t = function(t) {
-    var e = t.parser;
+    var e = t.storage,
+      r = t.parser;
     (this.reducer =
       t.reducer ||
       function(t) {
-        return JSON.stringify(t);
+        return JSON.stringify(t || '');
       }),
       (this.parser =
-        e ||
+        r ||
         function(t) {
-          return JSON.parse(t);
+          return JSON.parse(t || '');
         }),
       (this.previusValue = {}),
       (this.watchers = {}),
-      (this.storage = this.storage || {
+      (this.storage = e || {
         getItem: function(t) {
           return window.localStorage[t];
         },
         setItem: function(t, e) {
-          return window.localStorage[e];
+          return (window.localStorage[t] = e);
         }
       }),
       setInterval(this._callWatchers, 1e3);
@@ -40,6 +41,7 @@
       });
     }),
     (t.prototype.get = function(t) {
+      console.log('>>>', t, this.storage.getItem(t));
       var e = this.parser(this.storage.getItem(t));
       return (
         (this.previusValue[t] = e || this.previusValue[t]), this.previusValue[t]
@@ -50,7 +52,12 @@
         this.storage.setItem(t, this.previusValue[t]);
     }),
     (t.prototype.on = function(t, e) {
-      return !!(e && e instanceof Function) && (this.watchers[t].push(e), !0);
+      return (
+        !!(e && e instanceof Function) &&
+        ((this.watchers[t] = this.watchers[t] || []),
+        this.watchers[t].push(e),
+        !0)
+      );
     }),
     (t.prototype.off = function(t, e) {
       var r = this.watchers[t].indexOf(e);
@@ -67,7 +74,7 @@
         s = function(t) {
           t.replaceState(Object.assign({}, t.state, n.get(r)));
         },
-        a = function(t) {
+        o = function(t) {
           var r = n.get();
           return (e.paths || Object.keys(t.state)).filter(function(n) {
             return (
@@ -79,19 +86,19 @@
       return function(t) {
         s(t),
           e.initialized && e.initialized(t),
-          n.watch(r, function() {
-            a(t), s(t);
+          n.on(r, function() {
+            o(t), s(t);
           }),
           t.subscribe(function(r, s) {
-            var o, u;
+            var a, u;
             i(r.type, payload) &&
-              a(t).length &&
+              o(t).length &&
               n.set(
                 e.paths
-                  ? ((o = s),
+                  ? ((a = s),
                     (u = []),
                     e.paths.forEach(function(t) {
-                      o.hasOwnProperty(t) && u.push(o[t]);
+                      a.hasOwnProperty(t) && u.push(a[t]);
                     }),
                     u)
                   : s

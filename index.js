@@ -35,7 +35,7 @@ export default function(options) {
     options.initialized && options.initialized(store);
 
     // watch storage value change
-    storage.watch(key, () => {
+    storage.on(key, () => {
       invokeWatchers(store);
       replaceState(store);
     });
