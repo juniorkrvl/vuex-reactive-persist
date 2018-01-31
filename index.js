@@ -20,15 +20,19 @@ export default function(options) {
   };
 
   // find changes between previous and current state and callback watches
-  const invokeWatchers = store => {
-    const prev = storage.get();
+  const invokeWatchers = (store, state) => {
+    let hasChange = false;
+    state = state || store.state;
+    const prev = storage.get() || {};
     const paths = options.paths || Object.keys(store.state);
-    return paths.filter(path => {
-      if (prev[path] === store.state[path]) return false;
-      options.watch[path] &&
+    paths.forEach(path => {
+      if (prev[path] === state[path]) return;
+      hasChange = true;
+      if (options.watch && options.watch[path]) {
         options.watch[path](state[path], prev[path], store);
-      return true;
+      }
     });
+    return hasChange;
   };
 
   return function(store) {
@@ -42,15 +46,14 @@ export default function(options) {
       replaceState(store);
     });
 
-    store.subscribe(({ type }, state) => {
+    store.subscribe(({ type, payload }, state) => {
       // check if mutation type should be considered
       if (!filter(type, payload)) return;
       // find current changes
-      const changes = invokeWatchers(store);
+      const hasChange = invokeWatchers(store, state);
       // save only on change
-      if (changes.length) {
-        storage.set(options.paths ? pick(state, options.paths) : state);
-      }
+      if (!hasChange) return;
+      storage.set(key, options.paths ? pick(state, options.paths) : state);
     });
   };
 }
@@ -61,11 +64,12 @@ export default function(options) {
  * @param {*Array} paths List of paths to pick
  */
 export function pick(object, paths) {
-  let list = [];
+  if (!object) return {};
+  let picked = {};
   paths.forEach(key => {
     if (object.hasOwnProperty(key)) {
-      list.push(object[key]);
+      picked[key] = object[key];
     }
   });
-  return list;
+  return picked;
 }

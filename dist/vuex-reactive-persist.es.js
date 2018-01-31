@@ -24,10 +24,11 @@ var t = function(t) {
     setInterval(this._callWatchers, 1e3);
 };
 function e(t, e) {
-  var r = [];
+  if (!t) return {};
+  var r = {};
   return (
     e.forEach(function(e) {
-      t.hasOwnProperty(e) && r.push(t[e]);
+      t.hasOwnProperty(e) && (r[e] = t[e]);
     }),
     r
   );
@@ -42,15 +43,19 @@ function e(t, e) {
   });
 }),
   (t.prototype.get = function(t) {
-    console.log('>>>', t, this.storage.getItem(t));
-    var e = this.parser(this.storage.getItem(t));
-    return (
-      (this.previusValue[t] = e || this.previusValue[t]), this.previusValue[t]
-    );
+    try {
+      var e = this.parser(this.storage.getItem(t));
+      this.previusValue[t] = e || this.previusValue[t];
+    } finally {
+      return this.previusValue[t];
+    }
   }),
   (t.prototype.set = function(t, e) {
-    (this.previusValue[t] = this.reducer(e)),
-      this.storage.setItem(t, this.previusValue[t]);
+    try {
+      (this.previusValue[t] = this.reducer(e)),
+        this.storage.setItem(t, this.previusValue[t]);
+    } finally {
+    }
   }),
   (t.prototype.on = function(t, e) {
     return (
@@ -66,32 +71,38 @@ function e(t, e) {
   });
 export default function(r) {
   var n = (r = r || {}).key || 'vuex',
-    s = new t(r),
-    i =
+    i = new t(r),
+    s =
       r.filter ||
       function(t) {
         return !r.mutations || r.mutations.indexOf(t) >= 0;
       },
     a = function(t) {
-      t.replaceState(Object.assign({}, t.state, s.get(n)));
+      var e = i.get(n);
+      e && t.replaceState(Object.assign({}, t.state, e));
     },
-    o = function(t) {
-      var e = s.get();
-      return (r.paths || Object.keys(t.state)).filter(function(n) {
-        return (
-          e[n] !== t.state[n] &&
-          (r.watch[n] && r.watch[n](state[n], e[n], t), !0)
-        );
-      });
+    u = function(t, e) {
+      var n = !1;
+      e = e || t.state;
+      var s = i.get() || {};
+      return (
+        (r.paths || Object.keys(t.state)).forEach(function(i) {
+          s[i] !== e[i] &&
+            ((n = !0), r.watch && r.watch[i] && r.watch[i](e[i], s[i], t));
+        }),
+        n
+      );
     };
   return function(t) {
     a(t),
       r.initialized && r.initialized(t),
-      s.on(n, function() {
-        o(t), a(t);
+      i.on(n, function() {
+        u(t), a(t);
       }),
-      t.subscribe(function(n, a) {
-        i(n.type, payload) && o(t).length && s.set(r.paths ? e(a, r.paths) : a);
+      t.subscribe(function(a, o) {
+        s(a.type, a.payload) &&
+          u(t, o) &&
+          i.set(n, r.paths ? e(o, r.paths) : o);
       });
   };
 }

@@ -33,15 +33,19 @@ var t = function(t) {
   });
 }),
   (t.prototype.get = function(t) {
-    console.log('>>>', t, this.storage.getItem(t));
-    var e = this.parser(this.storage.getItem(t));
-    return (
-      (this.previusValue[t] = e || this.previusValue[t]), this.previusValue[t]
-    );
+    try {
+      var e = this.parser(this.storage.getItem(t));
+      this.previusValue[t] = e || this.previusValue[t];
+    } finally {
+      return this.previusValue[t];
+    }
   }),
   (t.prototype.set = function(t, e) {
-    (this.previusValue[t] = this.reducer(e)),
-      this.storage.setItem(t, this.previusValue[t]);
+    try {
+      (this.previusValue[t] = this.reducer(e)),
+        this.storage.setItem(t, this.previusValue[t]);
+    } finally {
+    }
   }),
   (t.prototype.on = function(t, e) {
     return (
@@ -57,43 +61,51 @@ var t = function(t) {
   }),
   (module.exports = function(e) {
     var r = (e = e || {}).key || 'vuex',
-      s = new t(e),
-      n =
+      n = new t(e),
+      i =
         e.filter ||
         function(t) {
           return !e.mutations || e.mutations.indexOf(t) >= 0;
         },
-      i = function(t) {
-        t.replaceState(Object.assign({}, t.state, s.get(r)));
+      s = function(t) {
+        var e = n.get(r);
+        e && t.replaceState(Object.assign({}, t.state, e));
       },
-      a = function(t) {
-        var r = s.get();
-        return (e.paths || Object.keys(t.state)).filter(function(s) {
-          return (
-            r[s] !== t.state[s] &&
-            (e.watch[s] && e.watch[s](state[s], r[s], t), !0)
-          );
-        });
+      a = function(t, r) {
+        var i = !1;
+        r = r || t.state;
+        var s = n.get() || {};
+        return (
+          (e.paths || Object.keys(t.state)).forEach(function(n) {
+            s[n] !== r[n] &&
+              ((i = !0), e.watch && e.watch[n] && e.watch[n](r[n], s[n], t));
+          }),
+          i
+        );
       };
     return function(t) {
-      i(t),
+      s(t),
         e.initialized && e.initialized(t),
-        s.on(r, function() {
-          a(t), i(t);
+        n.on(r, function() {
+          a(t), s(t);
         }),
-        t.subscribe(function(r, i) {
-          var o, u;
-          n(r.type, payload) &&
-            a(t).length &&
-            s.set(
+        t.subscribe(function(s, u) {
+          i(s.type, s.payload) &&
+            a(t, u) &&
+            n.set(
+              r,
               e.paths
-                ? ((o = i),
-                  (u = []),
-                  e.paths.forEach(function(t) {
-                    o.hasOwnProperty(t) && u.push(o[t]);
-                  }),
-                  u)
-                : i
+                ? (function(t, e) {
+                    if (!t) return {};
+                    var r = {};
+                    return (
+                      e.forEach(function(e) {
+                        t.hasOwnProperty(e) && (r[e] = t[e]);
+                      }),
+                      r
+                    );
+                  })(u, e.paths)
+                : u
             );
         });
     };

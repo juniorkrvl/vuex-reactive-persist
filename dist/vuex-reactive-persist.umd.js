@@ -41,15 +41,19 @@
       });
     }),
     (t.prototype.get = function(t) {
-      console.log('>>>', t, this.storage.getItem(t));
-      var e = this.parser(this.storage.getItem(t));
-      return (
-        (this.previusValue[t] = e || this.previusValue[t]), this.previusValue[t]
-      );
+      try {
+        var e = this.parser(this.storage.getItem(t));
+        this.previusValue[t] = e || this.previusValue[t];
+      } finally {
+        return this.previusValue[t];
+      }
     }),
     (t.prototype.set = function(t, e) {
-      (this.previusValue[t] = this.reducer(e)),
-        this.storage.setItem(t, this.previusValue[t]);
+      try {
+        (this.previusValue[t] = this.reducer(e)),
+          this.storage.setItem(t, this.previusValue[t]);
+      } finally {
+      }
     }),
     (t.prototype.on = function(t, e) {
       return (
@@ -72,36 +76,44 @@
             return !e.mutations || e.mutations.indexOf(t) >= 0;
           },
         s = function(t) {
-          t.replaceState(Object.assign({}, t.state, n.get(r)));
+          var e = n.get(r);
+          e && t.replaceState(Object.assign({}, t.state, e));
         },
-        o = function(t) {
-          var r = n.get();
-          return (e.paths || Object.keys(t.state)).filter(function(n) {
-            return (
-              r[n] !== t.state[n] &&
-              (e.watch[n] && e.watch[n](state[n], r[n], t), !0)
-            );
-          });
+        a = function(t, r) {
+          var i = !1;
+          r = r || t.state;
+          var s = n.get() || {};
+          return (
+            (e.paths || Object.keys(t.state)).forEach(function(n) {
+              s[n] !== r[n] &&
+                ((i = !0), e.watch && e.watch[n] && e.watch[n](r[n], s[n], t));
+            }),
+            i
+          );
         };
       return function(t) {
         s(t),
           e.initialized && e.initialized(t),
           n.on(r, function() {
-            o(t), s(t);
+            a(t), s(t);
           }),
-          t.subscribe(function(r, s) {
-            var a, u;
-            i(r.type, payload) &&
-              o(t).length &&
+          t.subscribe(function(s, o) {
+            i(s.type, s.payload) &&
+              a(t, o) &&
               n.set(
+                r,
                 e.paths
-                  ? ((a = s),
-                    (u = []),
-                    e.paths.forEach(function(t) {
-                      a.hasOwnProperty(t) && u.push(a[t]);
-                    }),
-                    u)
-                  : s
+                  ? (function(t, e) {
+                      if (!t) return {};
+                      var r = {};
+                      return (
+                        e.forEach(function(e) {
+                          t.hasOwnProperty(e) && (r[e] = t[e]);
+                        }),
+                        r
+                      );
+                    })(o, e.paths)
+                  : o
               );
           });
       };
