@@ -9,7 +9,7 @@
     "build": "microbundle --output dist --name reactivePersistedState index.js",
     "precommit": "lint-staged",
     "prepublish": "npm run build",
-    "test": "npm-run-all test:**",
+    "test": "npm run test:jest && npm run test:size",
     "test:jest": "jest --env=jsdom",
     "test:size": "bundlesize"
   },
