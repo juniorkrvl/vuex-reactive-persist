@@ -6,13 +6,16 @@
   "license": "MIT",
   "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
-    "build": "microbundle --output dist --name reactivePersistedState index.js",
+    "build": "microbundle --output dist --name reactivePersistedState src/index.js",
     "prepublish": "npm run test && npm run build",
     "test": "npm run test:jest && npm run test:size",
     "test:jest": "jest --env=jsdom",
-    "test:size": "bundlesize"
+    "test:size": "bundlesize",
+    "patch": "npm version patch --no-git-tag-version && git add package.json && git commit -m 'Update version:patch' && git push origin master && npm publish",
+    "minor": "npm version minor --no-git-tag-version && git add package.json && git commit -m 'Update version:minor' && git push origin master && npm publish",
+    "major": "npm version major --no-git-tag-version && git add package.json && git commit -m 'Update version:major' && git push origin master && npm publish"
   },
-  "main": "index.js",
+  "main": "src/index.js",
   "module": "dist/vuex-reactive-persist.es.js",
   "jsnext:main": "dist/vuex-reactive-persist.es.js",
   "umd:main": "dist/vuex-reactive-persist.umd.js",

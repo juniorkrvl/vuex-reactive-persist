@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import Storage from 'dom-storage';
-import reactivePersistedState from './index';
+import reactivePersistedState from './src/index';
 
 // Do not show the production tip while running tests.
 Vue.config.productionTip = false;
