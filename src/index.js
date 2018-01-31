@@ -28,7 +28,7 @@ export default function(options) {
   };
 
   // find changes between previous and current state and callback watches
-  const invokeWatchers = (store, state, reverse = false) => {
+  const invokeWatchers = ({ store, state, reverse }) => {
     let hasChange = false;
     state = state || store.state;
     const prevState = storage.getState() || {};
@@ -38,9 +38,11 @@ export default function(options) {
       if (stateVal === savedVal) return;
       hasChange = true;
       if (watch && watch[path]) {
-        reverse
-          ? watch[path](savedVal, stateVal, store)
-          : watch[path](stateVal, savedVal, store);
+        watch[path](
+          reverse ? savedVal : stateVal,
+          reverse ? stateVal : savedVal,
+          store
+        );
       }
     });
     return hasChange;
@@ -54,7 +56,7 @@ export default function(options) {
 
     // watch storage value change
     storage.on(() => {
-      invokeWatchers(store, (reverse = true));
+      invokeWatchers({ store, reverse: true });
       replaceState(store);
     });
 
@@ -62,7 +64,7 @@ export default function(options) {
       // check if mutation type should be considered
       if (!filter(mutation.type || mutation)) return;
       // find current changes
-      const hasChange = invokeWatchers(store, state);
+      const hasChange = invokeWatchers({ store, state });
       // save only on change
       if (!hasChange) return;
       let picked = state;
