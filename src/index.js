@@ -9,7 +9,19 @@ export default function(opt) {
 
   // filters the mutation type
   opt.filter =
-    opt.filter || (x => !opt.mutations || opt.mutations.indexOf(x) >= 0);
+    opt.filter ||
+    function(mutation) {
+      if (!opt.watch) return false;
+      const type = mutation.type || mutation;
+      if (Array.isArray(opt.watch)) {
+        return opt.watch.indexOf(type) < 0;
+      }
+      if (type in opt.watch) {
+        opt.watch[type](opt.store);
+        return false;
+      }
+      return true;
+    };
 
   // replace the current state with new state from storage
   opt.replaceState = () => {
@@ -46,9 +58,7 @@ export default function(opt) {
     }
 
     store.subscribe((mutation, state) => {
-      const type = mutation.type || mutation;
-      opt.watch && opt.watch[type] && opt.watch[type](store);
-      if (!opt.filter(type)) return;
+      if (opt.filter(mutation)) return;
       opt.storeState(state);
     });
   };

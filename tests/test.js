@@ -217,19 +217,18 @@ it('should not clone circular objects when rehydrating', () => {
   expect(store.subscribe).toBeCalled();
 });
 
-it('works using mutations option', () => {
+it('works using watch array option', () => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: {} });
 
   const plugin = reactivePersistedState({
     storage,
-    mutations: ['filter', 'foo/me']
+    watch: ['filter', 'foo/me']
   });
   plugin(store);
 
-  store._subscribers[0]('mutation', { changed: 'state' });
-
-  expect(storage.getItem('vuex')).toBe('{}');
+  store._subscribers[0]('mutation', { changed: 'mutation' });
+  expect(storage.getItem('vuex')).toBe(JSON.stringify({}));
 
   store._subscribers[0]('filter', { changed: 'state' });
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
@@ -244,20 +243,18 @@ it('works using filter method', () => {
 
   const plugin = reactivePersistedState({
     storage,
-    filter: mutation => ['filter'].indexOf(mutation) !== -1
+    filter: mutation => ['filter'].indexOf(mutation) < 0
   });
   plugin(store);
 
   store._subscribers[0]('mutation', { changed: 'state' });
-
   expect(storage.getItem('vuex')).toBe('{}');
 
   store._subscribers[0]('filter', { changed: 'state' });
-
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
 });
 
-it('calls watch method on mutation', () => {
+it('can properly use watch object on mutation', () => {
   const storage = new Storage();
   const store = new Vuex.Store({ state: { changed: { foo: 'saved' } } });
 
@@ -269,6 +266,9 @@ it('calls watch method on mutation', () => {
   reactivePersistedState(options)(store);
 
   store._subscribers[0]('mutation', { changed: { foo: 'bar' } });
+  expect(storage.getItem('vuex')).toBe(
+    JSON.stringify({ changed: { foo: 'bar' } })
+  );
   expect(watchedKey).toBeCalledWith(store);
 });
 
