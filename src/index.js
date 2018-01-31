@@ -59,10 +59,7 @@ export default function(opt) {
 
     // watch storage value change
     if (opt.watchInterval >= 0) {
-      opt.storage.on(() => {
-        opt.invokeWatchers({ reverse: true });
-        opt.replaceState();
-      }, opt.watchInterval);
+      opt.storage.on(opt.replaceState, opt.watchInterval);
     }
 
     store.subscribe((mutation, state) => {
