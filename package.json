@@ -1,12 +1,12 @@
 {
   "name": "vuex-reactive-persist",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "description": "Persist the vuex states to localstorage and watch for changes",
   "author": "Sudipto Chandra <dipu.sudipta@gmail.com>",
   "license": "MIT",
   "homepage": "https://github.com/dipu-bd/vuex-reactive-persist#readme",
   "scripts": {
-    "build": "microbundle --output dist --name reactivePersist src/index.js",
+    "build": "rimraf dist && microbundle --output dist --name reactivePersist src/index.js",
     "precommit": "npm run build && lint-staged",
     "test": "npm run test:jest && npm run test:size",
     "test:jest": "jest --env=jsdom",
@@ -65,6 +65,7 @@
     "lint-staged": "^6.1.0",
     "microbundle": "^0.4.3",
     "prettier": "^1.10.2",
+    "rimraf": "^2.6.2",
     "vue": "^2.5.13",
     "vuex": "^3.0.1"
   },
