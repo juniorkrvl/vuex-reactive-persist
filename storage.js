@@ -52,8 +52,8 @@ export default class Storage {
    */
   set(key, val) {
     try {
-      this.previusValue[key] = this.reducer(val);
-      this.storage.setItem(key, this.previusValue[key]);
+      this.previusValue[key] = val;
+      this.storage.setItem(key, this.reducer(this.previusValue[key]));
     } finally {
     }
   }

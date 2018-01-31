@@ -8,9 +8,7 @@ export default function(options) {
   // filters the mutation type
   const filter =
     options.filter ||
-    (type => {
-      return !options.mutations || options.mutations.indexOf(type) >= 0;
-    });
+    (type => !options.mutations || options.mutations.indexOf(type) >= 0);
 
   // replace the current state with new state from storage
   const replaceState = store => {
@@ -23,7 +21,7 @@ export default function(options) {
   const invokeWatchers = (store, state) => {
     let hasChange = false;
     state = state || store.state;
-    const prev = storage.get() || {};
+    const prev = storage.get(key) || {};
     const paths = options.paths || Object.keys(store.state);
     paths.forEach(path => {
       if (prev[path] === state[path]) return;
@@ -53,7 +51,8 @@ export default function(options) {
       const hasChange = invokeWatchers(store, state);
       // save only on change
       if (!hasChange) return;
-      storage.set(key, options.paths ? pick(state, options.paths) : state);
+      let picked = pick(state, options.paths);
+      storage.set(key, picked);
     });
   };
 }
@@ -64,12 +63,8 @@ export default function(options) {
  * @param {*Array} paths List of paths to pick
  */
 export function pick(object, paths) {
-  if (!object) return {};
+  if (!paths || !object) return object;
   let picked = {};
-  paths.forEach(key => {
-    if (object.hasOwnProperty(key)) {
-      picked[key] = object[key];
-    }
-  });
+  paths.forEach(key => (picked[key] = object[key]));
   return picked;
 }

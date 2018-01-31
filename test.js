@@ -91,33 +91,33 @@ it('should persist the changed parial state back to serialized JSON', () => {
   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
 });
 
-// it('persist the changed partial state back to serialized JSON under a configured key', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
+it('persist the changed partial state back to serialized JSON under a configured key', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
 
-//   const plugin = reactivePersistedState({
-//     storage,
-//     key: 'custom',
-//     paths: ['changed']
-//   });
-//   plugin(store);
+  const plugin = reactivePersistedState({
+    storage,
+    key: 'custom',
+    paths: ['changed']
+  });
+  plugin(store);
 
-//   store._subscribers[0]('mutation', { changed: 'state' });
+  store._subscribers[0]('mutation', { changed: 'state' });
 
-//   expect(storage.getItem('custom')).toBe(JSON.stringify({ changed: 'state' }));
-// });
+  expect(storage.getItem('custom')).toBe(JSON.stringify({ changed: 'state' }));
+});
 
-// it('persist the changed full state back to serialized JSON when no paths are given', () => {
-//   const storage = new Storage();
-//   const store = new Vuex.Store({ state: {} });
+it('persist the changed full state back to serialized JSON when no paths are given', () => {
+  const storage = new Storage();
+  const store = new Vuex.Store({ state: {} });
 
-//   const plugin = reactivePersistedState({ storage });
-//   plugin(store);
+  const plugin = reactivePersistedState({ storage });
+  plugin(store);
 
-//   store._subscribers[0]('mutation', { changed: 'state' });
+  store._subscribers[0]('mutation', { changed: 'state' });
 
-//   expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
-// });
+  expect(storage.getItem('vuex')).toBe(JSON.stringify({ changed: 'state' }));
+});
 
 // it('persist the changed partial state back to serialized JSON under a nested path', () => {
 //   const storage = new Storage();
