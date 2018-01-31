@@ -34,66 +34,64 @@ const store = new Vuex.Store({
 
 ### `reactivePersist([options])`
 
-Creates a new instance of the plugin with the given options. The following options
-can be provided to configure the plugin for your specific needs:
-
-- `key <String>`: The key to store the persisted state under. (default: `vuex`)
-- `paths <Array>`: An array of any paths to partially persist the state. If no paths are given, the complete state is persisted. (default: `null`)
-- `storage <Object>`: Storage to store. It must have `getItem` and `setItem` methods. Defaults to localStorage.
-- `filter <Function>`: A function that will be called to filter any mutations which will trigger. You can also pass `mutations` instead.
-- `mutations <Array>`: List of mutations to monitor. If `filter` method is provided this will be ignored.
-- `watch <Object>`: Keys should be functions that accepts three params: `stateVal`, `savedVal`, `store`.
-- `initialized <Function>`: This is called right after the `store` is replaced with saved value. It provided the `store` as argument.
-- `disableWatch <Boolean>`: Pass `true` if you don't want your storage to be observed for value changes. The `watch` option still works. (default: `false`)
-
-### More on `watch` feature
-
-The module automatically watches for changes. A method `watch` in option is called whenever the storage observer detects changes, or the mutation updates the *value* of the *key* corresponding to the method name.
-
-Suppose you have vuex store having state like this:
-
 ```js
-{
-  some: 'thing',
-  parent: {
-    child: 'state',
-    another: 'child'
-  }
-}
-```
-
-Watch for changes on some properties:
-
-```js
-reactivePersist({
-  watch: {
-    some: function(current, saved, store) {
-      console.log('some property has been changed!');
-    },
-    'parent.child': function(current, saved, store) {
-      console.log(current, saved)
-      store.dispatch('action')
-    }
-  }
+const store = new Vuex.Store({
+  // ...
+  plugins: [
+    // All options are optional
+    reactivePersist({
+      key: 'vuex', // The key to store the persisted state,
+      disableWatch: false, // Pass `true` if you don't want your storage to be observed
+                           // for value changes. The `watch` option still works.
+      initialize: function(store) {
+        // This is called right after the `store` is replaced with saved value
+        store.dispatch('clock/start')
+      },
+      paths: [
+        // An array of any paths to partially persist the state.
+        // If no paths are given, the complete state is persisted
+        'bar',
+        'foo.bar'
+      ],
+      watch: {
+        // keys of the state to watch.
+        // all should have functions that accepts three params:
+        //    stateVal: the value in the current state
+        //    savedVal: the value stored in the storage
+        //    store: the current store object
+        bar: function(current, saved, store) {
+          console.log('some property has been changed!');
+        },
+        'foo.bar': function(current, saved, store) {
+          console.log(current, saved)
+          store.dispatch('action')
+        }
+      },
+      mutations: [
+        // List of mutations to monitor.
+        // If `filter` method is provided this will be ignored.
+        'updateBar',
+        'foo/setBar'
+      ],
+      filter: function(mutation) {
+        // A function that will be called to filter any mutations which will trigger.
+        // mutations options will be ignored if this method exists
+        return ['filter'].indexOf(mutation.type) >= 0
+      },
+      storage: {
+        // Storage to store.
+        // Must have getItem, setItem methods
+        getItem: function (key) { return window.localStorage[key]; },
+        setItem: function (key, val) { window.localStorage[key] = val; }
+      }
+    })
+  ]
 })
 ```
 
-### `initialize` method
-
-
-```js
-reactivePersist({
-  initialize: function(store) {
-    store.dispatch('clock/start')
-  }
-})
-```
-
-## Customize Storage
+### Cookie Storage
 
 You can easily customize the storage. Following example shows a way to use cookies instead of `localStorage`:
-
-<!-- [![Edit vuex-persistedstate with js-cookie](https://codesandbox.io/static/img/play-codesandbox.svg)](https://codesandbox.io/s/xl356qvvkz?autoresize=1) -->
 
 ```js
 import { Store } from 'vuex'
@@ -113,7 +111,9 @@ const store = new Store({
 })
 ```
 
-Any object following the Storage protocol (`getItem`, `setItem`) could be passed:
+### Session Storage
+
+In fact, any object following the Storage protocol (`getItem`, `setItem`) could be passed:
 
 ```js
 createPersistedState({ storage: window.sessionStorage })
