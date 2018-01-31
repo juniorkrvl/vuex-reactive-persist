@@ -7,29 +7,28 @@ export default class Storage {
    *    parser: Parses the value from string
    * }
    */
-  constructor({storage, reducer, parser}) {
-    this.reducer = reducer || (v => JSON.stringify(v))
-    this.parser = parser || (v => JSON.parse(v))
-    this.previusValue = {}
-    this.watchers = {}
+  constructor({ storage, reducer, parser }) {
+    this.reducer = reducer || (v => JSON.stringify(v));
+    this.parser = parser || (v => JSON.parse(v));
+    this.previusValue = {};
+    this.watchers = {};
 
     this.storage = this.storage || {
-      get: (key) => window.localStorage[key],
-      set: (key, val) => window.localStorage[key, val]
-    }
-    
+      get: key => window.localStorage[key],
+      set: (key, val) => window.localStorage[(key, val)]
+    };
+
     // watch every 1000s
-    setInterval(this._callWatchers, 1000)
+    setInterval(this._callWatchers, 1000);
   }
-  
 
   // Call every watcher that has changed values
   _callWatchers() {
     Object.keys(this.watchers).forEach(key => {
       if (this.previusValue[key] !== this.storage[key]) {
-        this.watchers[key].forEach(f => f())
+        this.watchers[key].forEach(f => f());
       }
-    })
+    });
   }
 
   /**
@@ -38,8 +37,8 @@ export default class Storage {
    * @param {*Any} def Default value
    */
   get(key, def) {
-    this.previusValue[key] = this.parser(this.storage[key]) || def
-    return this.previusValue[key]
+    this.previusValue[key] = this.parser(this.storage[key]) || def;
+    return this.previusValue[key];
   }
 
   /**
@@ -48,32 +47,32 @@ export default class Storage {
    * @param {*Any} val Value to store
    */
   set(key, val) {
-    this.previusValue[key] = this.reducer(val)
-    this.storage[key] = this.previusValue[key]
+    this.previusValue[key] = this.reducer(val);
+    this.storage[key] = this.previusValue[key];
   }
 
   /**
    * Adds watcher for value change of a key
-   * @param {*String} key 
-   * @param {*Function} callback 
+   * @param {*String} key
+   * @param {*Function} callback
    */
   on(key, callback) {
     if (callback && callback instanceof Function) {
-      this.watchers[key].push(callback)
-      return true
+      this.watchers[key].push(callback);
+      return true;
     }
-    return false
+    return false;
   }
 
   /**
    * Removes a watcher
-   * @param {*String} key 
-   * @param {*Function} callback 
+   * @param {*String} key
+   * @param {*Function} callback
    */
   off(key, callback) {
-    const index = this.watchers[key].indexOf(callback)
-    if (index < 0) return false
-    this.watchers.splice(index, 1)
-    return true
+    const index = this.watchers[key].indexOf(callback);
+    if (index < 0) return false;
+    this.watchers.splice(index, 1);
+    return true;
   }
 }
