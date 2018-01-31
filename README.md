@@ -1,8 +1,10 @@
 # vuex-reactive-persist
 
-Persist [Vuex](http://vuex.vuejs.org/) state with [localStorage](https://developer.mozilla.org/nl/docs/Web/API/Window/localStorage) with observe and react for changes feature.
+Persist [Vuex](http://vuex.vuejs.org/) state with [localStorage](https://developer.mozilla.org/nl/docs/Web/API/Window/localStorage) and observe changes from outside the current vue instance.
 
-> It took some inspiration from [vuex-persistedstate](https://github.com/robinvdvleuten/vuex-persistedstate)
+This module is helpful in case you want pass your changed state across multiple open tabs.
+
+> It has some inspiration from [vuex-persistedstate](https://github.com/robinvdvleuten/vuex-persistedstate)
 
 ## Requirements
 
@@ -42,10 +44,13 @@ can be provided to configure the plugin for your specific needs:
 - `mutations <Array>`: List of mutations to monitor. If `filter` method is provided this will be ignored.
 - `watch <Object>`: Prove keys to observe for changes. Keys should be functions that accepts three params: `stateVal`, `savedVal`, `store`.
 - `initialized <Function>`: This is called right after the `store` is replaced with saved value. It provided the `store` as argument.
+- `disableWatch <Boolean>`: Pass `true` if you don't want your storage to be observed for value changes. The `watch` option still works. (default: `false`)
 
 ### More on `watch` feature
 
-The module automatically watches for changes. You can listen to them by passing keys to `watch` option. Suppose you have vuex store with state like this:
+The module automatically watches for changes. You can listen to them by passing keys to `watch` option. This method is called whenever the mutation updates the value or the storage observer detects changes.
+
+Suppose you have vuex store having state like this:
 
 ```js
 {
@@ -57,7 +62,7 @@ The module automatically watches for changes. You can listen to them by passing 
 }
 ```
 
-You can watch for changes like this:
+Watch for changes on some properties:
 
 ```js
 reactivePersist({
